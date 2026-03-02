@@ -24,3 +24,20 @@ const ctx = canvas.getContext("2d");
     p2.y = Math.max(p2.r, Math.min(canvas.height - p2.r, p2.y));
     p2.x = Math.max(p2.r, Math.min(canvas.width - p2.r, p2.x));
  }
+
+function beweegPuck() {
+    puck.x += puck.vx;
+    puck.y += puck.vy;
+
+    if(puck.y < puck.r || puck.y > canvas.height - puck.r) {
+          puck.vy *= -1;
+    }
+
+    if(puck.x < puck.r || puck.x > canvas.width - puck.r) {
+            puck.vx *= -1;
+}    
+}
+
+
+
+    
