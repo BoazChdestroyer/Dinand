@@ -207,7 +207,7 @@ header{
     width: auto;
     height: 40vh;
     overflow: hidden;
-    border: 1px solid gray;
+    border: 1px solid white;
     border-radius: 20px;
     transition: 0.5s;
 }
@@ -263,7 +263,7 @@ header{
 }
 
 .card:hover{
-    box-shadow: 0 0 15px white;
+    box-shadow: 0 0 15px #94A3B8;
 }
 
 .card:nth-child(1){
