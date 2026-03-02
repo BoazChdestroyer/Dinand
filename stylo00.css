@@ -1,8 +1,7 @@
 body{
     margin: 0;
     padding: 0;
-    /*background-color:#0e1321;*/
-    background-color: green; 
+    background-color:#0e1321;
     scroll-behavior: smooth;
 }
 
