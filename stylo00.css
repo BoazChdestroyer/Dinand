@@ -1,0 +1,358 @@
+body{
+    margin: 0;
+    padding: 0;
+    background-color:#0e1321;
+    scroll-behavior: smooth;
+}
+
+.container{
+    display: flex;
+    flex-direction: column;                             /*elementen onder elkaar */                  
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    position: relative;
+}
+
+header{
+    position: absolute; 
+    top: 0;
+    right: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;  /*bepaalt de ruimte tussen de elementen, worden aan beide uiteinden geplaatst zo*/
+    padding: 10px 40px;
+    z-index: 999;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+}
+
+.head-links{
+    display: flex;
+    align-items: center;
+}
+
+.head-links img{
+    width: 29px;
+    height: 50px;
+    margin-right: 20px;
+}
+
+.head-rechts{
+    display: flex;
+}
+
+.head-rechts a{
+    text-decoration: none;
+    padding-left: 50px;
+    color: white;
+    font-size: 20px;
+    transition: 0.5s;
+}
+
+.head-rechts a:hover{
+    color: #94A3B8;
+}
+
+.home-section {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.home-vid{
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.home-video{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;      /* wordt passend gemaakt in de container */
+}
+
+.video-tekst{
+    z-index: 1;             /* wordt bovenop de video geplaatst*/
+    position: absolute;
+    top: 80px;
+    left: 50px;
+}
+
+.video-tekst h1{
+    font-size: 60px;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-weight: 900;
+    font-style: normal;
+    margin-top: 30px;
+    margin-bottom: 20px;
+    color: #15213d;
+}
+
+.video-tekst p{
+    color:#15213d;
+    max-width: 210px;
+}
+
+.DFS-tekst{
+    font-size: 60px;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-weight: 900;
+    position: absolute;
+    margin: 0;
+    right: 20px;
+    bottom: 30px;
+}
+
+.welkom-section{
+    width: 100%;
+    min-height: 100vh;
+    margin-top: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+}
+
+.img-box{
+    width: 360px;
+    height: 510px;
+    overflow: hidden;           /*rest van de elementen die niet in de box passen worden weggelaten*/
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50px;
+}
+
+.img-box img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.welkom-section p{
+    font-size: 12px;
+}
+
+.welkom-section h1{
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-weight: 900;
+    font-size: 100px;
+    max-width: 1150px;
+    text-align: center;
+    margin: 25px 0;
+    text-transform: uppercase;
+    background: linear-gradient(to right,  #0F172A, #1E40AF, #22D3EE, #22C55E, #A855F7, #EF4444, #0F172A);
+    background-size: 200%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: animate-gradient 2.5s linear infinite;
+}
+
+@keyframes animate-gradient {
+    to{
+        background-position: 200%;
+    }
+}
+
+.onderimg-tekst h4{
+    margin-top: 35px;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+.onderimg-tekst h5{
+    margin-top: 5px;
+    color:#94A3B8;
+    max-width: 425px;
+    text-align: center;
+    line-height: 25px;
+}
+
+.game-section{
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 80%;
+    margin: 100px auto 0 auto;
+}
+
+.card-tekst h4{
+    margin: 0 0 0 15px;
+}
+
+.card-tekst h5{
+    margin: 5px 0 0 15px;
+    color:#94A3B8;
+    max-width: 400px;
+    line-height: 25px;
+}
+
+.info-cards{
+    display: grid;                              /*content wordt onder elkaar geplaatst ipv naast elkaar bij flex */
+    /*grid-template-columns: auto auto; */
+    grid-template-columns: repeat(2, 1fr);          /*grootte van de vakken, 2 per */          
+    gap: 20px;
+    height: 100%;
+    /*width: 100%;
+    margin-top: 30px;*/
+    width: 80%;          
+    margin: 30px auto 0; 
+}
+
+.card{
+    position: relative;
+    width: auto;
+    height: 40vh;
+    overflow: hidden;
+    border: 1px solid gray;
+    border-radius: 20px;
+    transition: 0.5s;
+}
+
+.card h1{
+    position: absolute;
+    margin: 0;
+    top: 10px;
+    left: 5%;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-size: 60px;
+    z-index: 1;
+    background: linear-gradient(to right,  #0F172A, #1E40AF, #22D3EE, #22C55E, #A855F7, #EF4444, #0F172A);
+    background-size: 200%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: animate-gradient 2.5s linear infinite;
+}
+
+.card p{
+    position: absolute;
+    top: 80px;
+    left: 5%;
+    z-index: 1;
+    max-width: 250px;
+    color: lightblue;
+}
+
+.card video{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card button{
+    position: absolute;
+    bottom: 5%;
+    right: 5%;
+    padding: 10px 25px;
+    border: 1px solid lightblue;
+    background: #0F172A;
+    color: lightblue;
+    border-radius: 20px;
+    box-shadow: 0 0 5px lightblue;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.card button:hover{
+    box-shadow: 0 0 15px lightblue;
+    opacity: 0.7;
+}
+
+.card:hover{
+    box-shadow: 0 0 15px white;
+}
+
+.card:nth-child(1){
+    grid-column: span 2;
+}
+
+.card:nth-child(2){
+    grid-row: span 2;
+    height: 60vh;
+}
+
+.card:nth-child(3){
+    grid-row: span 2;
+    height: 60vh;
+}
+
+.footer {
+    width: 100%;
+    margin-top: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+}
+
+.footer p {
+    margin: 0 20px;
+    font-size: 12px;
+}
+
+.footer img {
+    width: 29px;
+    height: 50px;
+    margin-right: 20px;
+}
+
+/* blur effect */
+
+.autoBlur {
+    animation: autoBlurAnimation linear both;
+    animation-timeline: view();             /*terwijl er wordt gescrolled gebeurt het */
+}
+
+@keyframes autoBlurAnimation{
+    0% {
+        filter: blur(40px);
+    }
+    40%,60% {
+        filter: blur(0);
+        transform: translateY(0px);
+        opacity: 1;
+    }
+    100% {
+        filter: blur(40px);
+        transform: translateY(-200px); /*beweegt 200px omhoog*/
+        opacity: 0;
+    }
+}
+
+.autoVulScherm{
+    animation: autoVulSchermAnimation linear both;
+    animation-timeline: view(70% 65%); /*start en eindwaardes van scroll*/
+}
+
+@keyframes autoVulSchermAnimation {
+    to{
+        width: 100%;
+        height: 100vh;
+        border-radius: 0;
+        margin-bottom: 100px;
+    }
+}
+
+.autoDisplay {
+/*animation: autoDisplayAnimation linear both;
+    animation-timeline: view(70% 15%);*/
+    animation: autoDisplayAnimation ease-out both;
+    animation-timeline: view();
+    animation-range: entry 20% cover 40%;
+}
+
+@keyframes autoDisplayAnimation {
+    from{
+        opacity: 0;
+        transform: translateY(200px) scale(0.3);
+    }
+    to{
+        opacity: 1;
+        transform: translate(0) scale(1);
+    }
+}
