@@ -1,7 +1,7 @@
 class MenuSystem {
     constructor() {
         this.selectedOption = 0;
-        this.menuOptions = ['Start Game', 'Highscores', 'Controls'];
+        this.menuOptions = ['Start Game', 'Highscores', 'Controls', 'Exit'];
         this.showHighscores = false;
         this.showControls = false;
         this.titlePulse = 0;
@@ -33,6 +33,9 @@ class MenuSystem {
                     return null;
                 case 2:
                     this.showControls = true;
+                    return null;
+                case 3: 
+                    window.location.href = "../index.html"; // Ga terug naar de startpagina
                     return null;
             }
         }
