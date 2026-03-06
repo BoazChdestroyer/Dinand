@@ -1,5 +1,4 @@
-// simple canvas fish game where the player is a fish
-// eat smaller fish to grow, avoid larger fish
+
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
@@ -7,7 +6,7 @@ const ctx = canvas.getContext('2d');
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
 
-// player fish
+/* vis ontwerpen */
 const player = {
     x: WIDTH / 2,
     y: HEIGHT / 2,
@@ -19,13 +18,13 @@ const player = {
 let score = 0;
 let gameOver = false;
 
-// other fishes
+/* andere random vissen */
 const fishes = [];
 
-// keyboard state
+
 const keys = {};
 
-// helpers
+
 function rand(min, max) {
     return Math.random() * (max - min) + min;
 }
@@ -37,11 +36,11 @@ class Fish {
         this.size = size;
         this.speed = speed;
         this.color = color;
-        this.dir = direction; // angle in radians
+        this.dir = direction;
     }
 
     update() {
-        // move in the direction
+        /* bewegen in huidige richting */
         this.x += Math.cos(this.dir) * this.speed;
         this.y += Math.sin(this.dir) * this.speed;
         // bounce off walls
@@ -61,7 +60,7 @@ class Fish {
 
 function spawnFish() {
     const size = rand(5, 60);
-    // bigger fishes are red, smaller are green
+    /* grote vissen rood, kleine groen */
     const color = size < player.size ? 'green' : 'red';
     const x = rand(0, WIDTH);
     const y = rand(0, HEIGHT);
@@ -76,7 +75,7 @@ function updatePlayer() {
     if (keys['ArrowLeft'] || keys['a']) player.x -= player.speed;
     if (keys['ArrowRight'] || keys['d']) player.x += player.speed;
 
-    // keep inside canvas
+    /*binnen cnavas houden */
     player.x = Math.max(player.size, Math.min(WIDTH - player.size, player.x));
     player.y = Math.max(player.size, Math.min(HEIGHT - player.size, player.y));
 }
@@ -88,15 +87,15 @@ function checkCollisions() {
         const dy = f.y - player.y;
         const dist = Math.hypot(dx, dy);
         if (dist < f.size + player.size) {
-            // collision
+            /*botsing */
             if (f.size < player.size) {
-                // eat fish
+                /* eet de vis */
                 fishes.splice(i, 1);
                 score += Math.floor(f.size);
-                // grow a bit
+                /* groei een beetje*/
                 player.size += f.size * 0.05;
             } else {
-                // eaten by big fish
+                /* gegeten door grotere vis */
                 gameOver = true;
             }
         }
@@ -149,16 +148,24 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-// input listeners
 window.addEventListener('keydown', e => {
+    /* voorkom dat pijltoetsen scrollen */
+    if ([
+        'ArrowUp',
+        'ArrowDown',
+        'ArrowLeft',
+        'ArrowRight',
+        ' '
+    ].includes(e.key)) {
+        e.preventDefault();
+    }
     keys[e.key] = true;
 });
 window.addEventListener('keyup', e => {
     keys[e.key] = false;
 });
 
-// spawn fish every second
+/* Spawn vis elke seconde */
 setInterval(spawnFish, 1000);
-
-// start the loop
+ 
 gameLoop();
