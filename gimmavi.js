@@ -20,6 +20,22 @@ const player = {
 let score = 0;
 let gameOver = false;
 
+/* knop om opnieuw te spelen */
+const restartBtn = document.createElement('button');
+restartBtn.textContent = 'Play Again';
+restartBtn.style.position = 'absolute';
+restartBtn.style.left = '50%';
+restartBtn.style.top = '60%';
+restartBtn.style.transform = 'translate(-50%, -50%)';
+restartBtn.style.padding = '10px 20px';
+restartBtn.style.fontSize = '20px';
+restartBtn.style.display = 'none';
+document.body.appendChild(restartBtn);
+
+restartBtn.addEventListener('click', () => {
+    resetGame();
+});
+
 /* andere random vissen */
 const fishes = [];
 
@@ -67,6 +83,21 @@ function spawnFish() {
     const speed = rand(0.5, 2);
     const dir = rand(0, Math.PI * 2);
     fishes.push(new Fish(x, y, size, speed, color, dir));
+}
+
+/* zet het spel terug naar beginwaarden */
+function resetGame() {
+    score = 0;
+    gameOver = false;
+    fishes.length = 0; /* leeg array */
+    player.x = WIDTH / 2;
+    player.y = HEIGHT / 2;
+    player.size = 20;
+    player.speed = 3;
+    player.dir = 0;
+    player.collisionRadius = player.size * 0.8;
+    restartBtn.style.display = 'none';
+    gameLoop(); /* start de animatie opnieuw */
 }
 
 function updatePlayer() {
@@ -165,6 +196,8 @@ function drawGameOver() {
     ctx.fillText('Game Over', WIDTH / 2, HEIGHT / 2 - 20);
     ctx.font = '20px sans-serif';
     ctx.fillText('Final Score: ' + score, WIDTH / 2, HEIGHT / 2 + 20);
+    /* laat de herstartknop zien */
+    restartBtn.style.display = 'block';
 }
 
 function gameLoop() {
