@@ -20,11 +20,22 @@ const player = {
 let score = 0;
 let gameOver = false;
 
-// restart button removed per request
-// const restartBtn = document.createElement('button');
-// ...button code removed
-// any logic to show/restart the game will be handled by reloading the page or another UI if needed
+const restartBtn = document.createElement('button');
+restartBtn.textContent = 'Play Again';
+restartBtn.style.position = 'absolute';
+restartBtn.style.padding = '10px 20px';
+restartBtn.style.fontSize = '20px';
+restartBtn.style.display = 'none';
+document.body.appendChild(restartBtn);
+restartBtn.addEventListener('click', () => resetGame());
 
+function positionRestartButton() {
+    const rect = canvas.getBoundingClientRect();
+    const btnWidth = restartBtn.offsetWidth;
+    const finalScoreY = HEIGHT / 2 + 20; // same vertical position used in drawGameOver
+    restartBtn.style.left = rect.left + WIDTH / 2 - btnWidth / 2 + 'px';
+    restartBtn.style.top = rect.top + finalScoreY + 20 + 'px'; // 20px below final score
+}
 
 /* andere random vissen */
 const fishes = [];
@@ -52,23 +63,11 @@ class Fish {
         /* bewegen in huidige richting */
         this.x += Math.cos(this.dir) * this.speed;
         this.y += Math.sin(this.dir) * this.speed;
-        /* zorg dat vissen binnen de canvas blijven - botst terug van de randen */
-        if (this.x < this.size) {
-            this.x = this.size;
-            this.dir = Math.PI - this.dir; // spiegel horizontaal
-        }
-        if (this.x > WIDTH - this.size) {
-            this.x = WIDTH - this.size;
-            this.dir = Math.PI - this.dir;
-        }
-        if (this.y < this.size) {
-            this.y = this.size;
-            this.dir = -this.dir; // spiegel verticaal
-        }
-        if (this.y > HEIGHT - this.size) {
-            this.y = HEIGHT - this.size;
-            this.dir = -this.dir;
-        }
+        /* terugkomen aan de andere kant als je de rand passeert */
+        if (this.x < -this.size) this.x = WIDTH + this.size;
+        if (this.x > WIDTH + this.size) this.x = -this.size;
+        if (this.y < -this.size) this.y = HEIGHT + this.size;
+        if (this.y > HEIGHT + this.size) this.y = -this.size;
     }
 
     draw() {
@@ -136,8 +135,8 @@ function checkCollisions() {
                 fishes.splice(i, 1);
                 score += Math.floor(f.size);
                 /* groei een beetje*/
-                player.size += f.size * 0.05;
-                player.collisionRadius = player.size * 0.8;
+                player.size += f.size * 0.08;
+                player.collisionRadius = player.size * 0.6;
             } else {
                 /* gegeten door grotere vis */
                 gameOver = true;
@@ -198,7 +197,9 @@ function drawGameOver() {
     ctx.fillText('Game Over', WIDTH / 2, HEIGHT / 2 - 20);
     ctx.font = '20px sans-serif';
     ctx.fillText('Final Score: ' + score, WIDTH / 2, HEIGHT / 2 + 20);
-  
+    /* laat de herstartknop zien */
+    positionRestartButton();
+    restartBtn.style.display = 'block';
 }
 
 function gameLoop() {
@@ -244,3 +245,4 @@ window.addEventListener('keyup', e => {
 setInterval(spawnFish, 1000);
  
 gameLoop();
+
