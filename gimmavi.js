@@ -84,9 +84,11 @@ function spawnFish() {
     /* grote vissen rood, kleine groen */
     const color = size < player.size ? 'green' : 'red';
 
-    /* kies een positie die niet op of vlakbij de speler verschijntt, zodat je niet meteen wordt opgeslokt */
+    /* kies een positie die netjes buiten een veiligheidscirkel rondom de speler ligt
+       zodat er niets direct naast of op je verschijnt (minimaal 50px afstand). */
     let x, y;
-    const minDist = player.collisionRadius + size * 0.5 + 20; /* 20px extra ruimte */
+    const fishRadius = size * 0.5; /*gebruiken dezelfde ratio als collisionRadius */
+    const minDist = player.collisionRadius + fishRadius + 50; /* extra marge */
     do {
         x = rand(0, WIDTH);
         y = rand(0, HEIGHT);
