@@ -27,15 +27,21 @@ restartBtn.style.position = 'absolute';
 restartBtn.style.padding = '10px 20px';
 restartBtn.style.fontSize = '20px';
 restartBtn.style.display = 'none';
+restartBtn.style.cursor = 'pointer';
 document.body.appendChild(restartBtn);
 restartBtn.addEventListener('click', () => resetGame());
 
 function positionRestartButton() {
     const rect = canvas.getBoundingClientRect();
     const btnWidth = restartBtn.offsetWidth;
+
+    /* horizontaal in het midden van de canvas */
     restartBtn.style.left = rect.left + rect.width / 2 - btnWidth / 2 + 'px';
-    const scoreY = rect.top + rect.height / 2 + 20;
-    restartBtn.style.top = scoreY + 20 + 'px'; /* plaats onder de score */
+
+    /* precies onder de “Final Score”-tekst (die staat op HEIGHT / 2 + 20) */
+    const centerY = rect.top + rect.height / 2;
+    /* wat extra marge eronder voor de knop */
+    restartBtn.style.top = centerY + 50 + 'px';
 }
 
 /* bij resize de knop opnieuw goed zetten als hij zichtbaar is */
@@ -97,13 +103,34 @@ function spawnFish() {
         color = 'red';
     }
 
-    /* spawn op een plek die niet te dicht bij de speler is */
+    /* spawn op een plek die NIET op of vlakbij de speler is */
     let x, y;
-    const minDist = player.size * 2;
-    for (let i = 0; i < 10; i++) {
+    const minDist = player.size * 3; /* iets grotere veilige afstand */
+    for (let i = 0; i < 30; i++) {
         x = rand(0, WIDTH);
         y = rand(0, HEIGHT);
-        if (Math.hypot(x - player.x, y - player.y) >= minDist) break;
+        const dist = Math.hypot(x - player.x, y - player.y);
+        if (dist >= minDist) break;
+    }
+
+    /* extra harde check: als het na alle pogingen nog te dichtbij is, verschuif hem naar de rand */
+    let finalDist = Math.hypot(x - player.x, y - player.y);
+    if (finalDist < minDist) {
+        /* zet hem aan een willekeurige rand van de canvas */
+        const side = Math.floor(Math.random() * 4);
+        if (side === 0) {        /* links */
+            x = 0;
+            y = rand(0, HEIGHT);
+        } else if (side === 1) { /* rechts */
+            x = WIDTH;
+            y = rand(0, HEIGHT);
+        } else if (side === 2) { /* boven */
+            x = rand(0, WIDTH);
+            y = 0;
+        } else {                 /* onder */
+            x = rand(0, WIDTH);
+            y = HEIGHT;
+        }
     }
 
     const speed = rand(0.5, 2);
@@ -246,9 +273,10 @@ function drawGameOver() {
     ctx.fillText('Game Over', WIDTH / 2, HEIGHT / 2 - 20);
     ctx.font = '20px sans-serif';
     ctx.fillText('Final Score: ' + score, WIDTH / 2, HEIGHT / 2 + 20);
-    /* laat de herstartknop zien */
-    positionRestartButton();
+
+    /* laat de herstartknop zien en goed positioneren */
     restartBtn.style.display = 'block';
+    positionRestartButton();
 }
 
 function gameLoop() {
@@ -294,5 +322,3 @@ window.addEventListener('keyup', e => {
 /* start: vissen spawnen en game loop starten */
 startSpawningFish();
 gameLoop();
-
-
