@@ -13,7 +13,8 @@ const player = {
     size: 20,
     speed: 3,
     color: 'blue',
-    dir: 0 /* kijkrichting in radialen, 0 = naar rechts */
+    dir: 0 /* kijkrichting in radialen, 0 = naar rechts */,
+    collisionRadius: 20 * 0.8 /* iets kleiner dan echt lijf */
 };
 
 let score = 0;
@@ -38,6 +39,7 @@ class Fish {
         this.speed = speed;
         this.color = color;
         this.dir = direction;
+        this.collisionRadius = size * 0.8;
     }
 
     update() {
@@ -93,7 +95,8 @@ function checkCollisions() {
         const dx = f.x - player.x;
         const dy = f.y - player.y;
         const dist = Math.hypot(dx, dy);
-        if (dist < f.size + player.size) {
+        // gebruik kleinere straal voor botsing
+        if (dist < f.collisionRadius + player.collisionRadius) {
             /*botsing */
             if (f.size < player.size) {
                 /* eet de vis */
@@ -101,6 +104,7 @@ function checkCollisions() {
                 score += Math.floor(f.size);
                 /* groei een beetje*/
                 player.size += f.size * 0.05;
+                player.collisionRadius = player.size * 0.8;
             } else {
                 /* gegeten door grotere vis */
                 gameOver = true;
