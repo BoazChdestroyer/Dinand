@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+
+<title>Hangman</title>
+<style>
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #128b49, #818cf8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .subtitle {
+    font-size: .85rem;
+    color: #64748b;
+    margin-bottom: 28px;
+  }
+
+  canvas {
+    background: #0f172a;
+    border-radius: 12px;
+    display: block;
+    margin-bottom: 0 auto 24px;
+  }
+</style>
+</head>
+<body>
+
+<div class="game-container" padding="20px" border-radius="10px" box-shadow="0 4px 8px rgba(0, 0, 0, 0.1)" max-width="400px" margin="40px auto">
+  <h1>Hangman</h1>
+  <p class="subtitle">Raad het woord voordat het poppetje compleet is!</p>
+
+  <canvas id="gallows" width="280" height="260"></canvas>
+
+  <div class="word-display" id="wordDisplay"></div>
+  <div class="status" id="status"></div>
+  <div class="keyboard" id="keyboard"></div>
+  <div class="message" id="message"></div>
+  <button class="new-game-btn" id="newGameBtn">Nieuw spel</button>
+</div>
+
+
+</body>
+</html>
