@@ -81,14 +81,11 @@ class Fish {
 
 function spawnFish() {
     const size = rand(5, 60);
-    /* grote vissen rood, kleine groen */
-    const color = size < player.size ? 'green' : 'red';
+    const color = Math.random() < 0.25 ? 'green' : 'red';
 
-    /* kies een positie die netjes buiten een veiligheidscirkel rondom de speler ligt
-       zodat er niets direct naast of op je verschijnt (minimaal 50px afstand). */
     let x, y;
-    const fishRadius = size * 0.5; /*gebruiken dezelfde ratio als collisionRadius */
-    const minDist = player.collisionRadius + fishRadius + 50; /* extra marge */
+    const fishRadius = size * 0.5;
+    const minDist = player.collisionRadius + fishRadius + 50;
     do {
         x = rand(0, WIDTH);
         y = rand(0, HEIGHT);
@@ -111,6 +108,7 @@ function resetGame() {
     player.dir = 0;
     player.collisionRadius = player.size * 0.5;
     restartBtn.style.display = 'none';
+    positionRestartBtn();
     gameLoop(); /* start de animatie opnieuw */
 }
 
@@ -210,6 +208,8 @@ function drawGameOver() {
     ctx.fillText('Game Over', WIDTH / 2, HEIGHT / 2 - 20);
     ctx.font = '20px sans-serif';
     ctx.fillText('Final Score: ' + score, WIDTH / 2, HEIGHT / 2 + 20);
+    /* positioneer knop opnieuw (in geval canvas is verplaatst) */
+    positionRestartBtn();
     /* laat de herstartknop zien */
     restartBtn.style.display = 'block';
 }
@@ -253,7 +253,7 @@ window.addEventListener('keyup', e => {
     keys[e.key] = false;
 });
 
-/* Spawn vis elke seconde */
-setInterval(spawnFish, 1000);
+/* Spawntijd vis elke 1,5 sec */
+setInterval(spawnFish, 1500);
  
 gameLoop();
