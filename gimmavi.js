@@ -1,24 +1,25 @@
-
-
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
 
-/* vis ontwerpen */
+/* speler-vis */
 const player = {
     x: WIDTH / 2,
     y: HEIGHT / 2,
     size: 20,
     speed: 3,
     color: 'blue',
-    dir: 0 /* kijkrichting in radialen, 0 = naar rechts */,
-    collisionRadius: 20 * 0.8 /* iets kleiner dan echt lijf */
+    dir: 0, /* kijkrichting in radialen, 0 = naar rechts */
+    collisionRadius: 20 * 0.8 /* botsingscirkel, iets kleiner dan lijf */
 };
 
 let score = 0;
 let gameOver = false;
+/* interval-id voor vissen spawnen, zodat we die kunnen stoppen en opnieuw starten */
+let spawnIntervalId = null;
+
 /* herstartknop maken, maar verbergen tot game over */
 const restartBtn = document.createElement('button');
 restartBtn.textContent = 'Play Again';
@@ -37,17 +38,24 @@ function positionRestartButton() {
     restartBtn.style.top = scoreY + 20 + 'px'; /* plaats onder de score */
 }
 
+/* bij resize de knop opnieuw goed zetten als hij zichtbaar is */
+window.addEventListener('resize', () => {
+    if (restartBtn.style.display === 'block') {
+        positionRestartButton();
+    }
+});
+
 /* andere random vissen */
 const fishes = [];
 
-
+/* toetsen die ingedrukt zijn */
 const keys = {};
-
 
 function rand(min, max) {
     return Math.random() * (max - min) + min;
 }
 
+/* klasse voor andere vissen */
 class Fish {
     constructor(x, y, size, speed, color, direction) {
         this.x = x;
@@ -75,6 +83,7 @@ class Fish {
     }
 }
 
+/* vissen spawnen (klein/groen of groot/rood) */
 function spawnFish() {
     /* 30% kans op kleine groene vis, 70% kans op grote rode vis */
     let size, color;
@@ -102,6 +111,21 @@ function spawnFish() {
     fishes.push(new Fish(x, y, size, speed, color, dir));
 }
 
+/* starten met vissen spawnen elke seconde, en vorige interval stoppen als die er nog is */
+function startSpawningFish() {
+    if (spawnIntervalId !== null) {
+        clearInterval(spawnIntervalId);
+    }
+    spawnIntervalId = setInterval(spawnFish, 1000);
+}
+
+/* alle toetsen-resetten, zodat er geen 'vast' ingedrukte richting blijft na restart */
+function resetKeys() {
+    for (const k in keys) {
+        keys[k] = false;
+    }
+}
+
 /* zet het spel terug naar beginwaarden */
 function resetGame() {
     score = 0;
@@ -113,9 +137,13 @@ function resetGame() {
     player.speed = 3;
     player.dir = 0;
     player.collisionRadius = player.size * 0.8;
-    gameLoop(); /* start de animatie opnieuw */
-}
 
+    resetKeys(); /* toetsen leegmaken */
+    restartBtn.style.display = 'none'; /* herstartknop verbergen */
+
+    startSpawningFish(); /* weer vissen spawnen */
+    /* gameLoop NIET opnieuw aanroepen; die draait al via requestAnimationFrame */
+}
 
 function updatePlayer() {
     /* beweging en oriëntatie bijhouden */
@@ -145,17 +173,21 @@ function checkCollisions() {
         const dist = Math.hypot(dx, dy);
         /* gebruik kleinere straal voor botsing */
         if (dist < f.collisionRadius + player.collisionRadius) {
-            /*botsing */
+            /* botsing */
             if (f.size < player.size) {
                 /* eet de vis */
                 fishes.splice(i, 1);
                 score += Math.floor(f.size);
-                /* groei een beetje*/
+                /* groei een beetje */
                 player.size += f.size * 0.08;
-                player.collisionRadius = player.size * 0.6;
+                player.collisionRadius = player.size * 0.8; /* zelfde verhouding houden */
             } else {
                 /* gegeten door grotere vis */
                 gameOver = true;
+                /* stoppen met vissen spawnen */
+                if (spawnIntervalId !== null) {
+                    clearInterval(spawnIntervalId);
+                }
             }
         }
     }
@@ -201,6 +233,7 @@ function drawPlayer() {
 function drawScore() {
     ctx.fillStyle = 'black';
     ctx.font = '20px sans-serif';
+    ctx.textAlign = 'left';
     ctx.fillText('Score: ' + score, 10, 30);
 }
 
@@ -240,6 +273,7 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
+/* key events */
 window.addEventListener('keydown', e => {
     /* voorkom dat pijltoetsen scrollen */
     if ([
@@ -257,8 +291,8 @@ window.addEventListener('keyup', e => {
     keys[e.key] = false;
 });
 
-/* Spawn vis elke seconde */
-setInterval(spawnFish, 1000);
- 
+/* start: vissen spawnen en game loop starten */
+startSpawningFish();
 gameLoop();
+
 
