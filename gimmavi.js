@@ -20,21 +20,11 @@ const player = {
 let score = 0;
 let gameOver = false;
 
-/* knop om opnieuw te spelen */
-const restartBtn = document.createElement('button');
-restartBtn.textContent = 'Play Again';
-restartBtn.style.position = 'absolute';
-restartBtn.style.left = '50%';
-restartBtn.style.top = '60%';
-restartBtn.style.transform = 'translate(-50%, -50%)';
-restartBtn.style.padding = '10px 20px';
-restartBtn.style.fontSize = '20px';
-restartBtn.style.display = 'none';
-document.body.appendChild(restartBtn);
+// restart button removed per request
+// const restartBtn = document.createElement('button');
+// ...button code removed
+// any logic to show/restart the game will be handled by reloading the page or another UI if needed
 
-restartBtn.addEventListener('click', () => {
-    resetGame();
-});
 
 /* andere random vissen */
 const fishes = [];
@@ -62,11 +52,23 @@ class Fish {
         /* bewegen in huidige richting */
         this.x += Math.cos(this.dir) * this.speed;
         this.y += Math.sin(this.dir) * this.speed;
-        /* terugkomen aan de andere kant als je de rand passeert */
-        if (this.x < -this.size) this.x = WIDTH + this.size;
-        if (this.x > WIDTH + this.size) this.x = -this.size;
-        if (this.y < -this.size) this.y = HEIGHT + this.size;
-        if (this.y > HEIGHT + this.size) this.y = -this.size;
+        /* zorg dat vissen binnen de canvas blijven - botst terug van de randen */
+        if (this.x < this.size) {
+            this.x = this.size;
+            this.dir = Math.PI - this.dir; // spiegel horizontaal
+        }
+        if (this.x > WIDTH - this.size) {
+            this.x = WIDTH - this.size;
+            this.dir = Math.PI - this.dir;
+        }
+        if (this.y < this.size) {
+            this.y = this.size;
+            this.dir = -this.dir; // spiegel verticaal
+        }
+        if (this.y > HEIGHT - this.size) {
+            this.y = HEIGHT - this.size;
+            this.dir = -this.dir;
+        }
     }
 
     draw() {
@@ -96,9 +98,9 @@ function resetGame() {
     player.speed = 3;
     player.dir = 0;
     player.collisionRadius = player.size * 0.8;
-    restartBtn.style.display = 'none';
     gameLoop(); /* start de animatie opnieuw */
 }
+
 
 function updatePlayer() {
     /* beweging en oriëntatie bijhouden */
@@ -196,8 +198,7 @@ function drawGameOver() {
     ctx.fillText('Game Over', WIDTH / 2, HEIGHT / 2 - 20);
     ctx.font = '20px sans-serif';
     ctx.fillText('Final Score: ' + score, WIDTH / 2, HEIGHT / 2 + 20);
-    /* laat de herstartknop zien */
-    restartBtn.style.display = 'block';
+  
 }
 
 function gameLoop() {
