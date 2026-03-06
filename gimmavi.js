@@ -14,7 +14,7 @@ const player = {
     speed: 3,
     color: 'blue',
     dir: 0 /* kijkrichting in radialen, 0 = naar rechts */,
-    collisionRadius: 20 * 0.5 
+    collisionRadius: 20 * 0.8 /* iets kleiner dan echt lijf */
 };
 
 let score = 0;
@@ -23,21 +23,14 @@ let gameOver = false;
 /* knop om opnieuw te spelen */
 const restartBtn = document.createElement('button');
 restartBtn.textContent = 'Play Again';
+restartBtn.style.position = 'absolute';
+restartBtn.style.left = '50%';
+restartBtn.style.top = '60%';
+restartBtn.style.transform = 'translate(-50%, -50%)';
 restartBtn.style.padding = '10px 20px';
 restartBtn.style.fontSize = '20px';
 restartBtn.style.display = 'none';
-
-/* play again knop locatie */
-const wrapper = document.createElement('div');
-wrapper.style.position = 'relative';
-wrapper.style.display = 'inline-block';
-canvas.parentNode.insertBefore(wrapper, canvas);
-wrapper.appendChild(canvas);
-wrapper.appendChild(restartBtn);
-
-restartBtn.style.position = 'absolute';
-restartBtn.style.left = '10px';
-restartBtn.style.top = '40px';
+document.body.appendChild(restartBtn);
 
 restartBtn.addEventListener('click', () => {
     resetGame();
@@ -62,7 +55,7 @@ class Fish {
         this.speed = speed;
         this.color = color;
         this.dir = direction;
-        this.collisionRadius = size * 0.5; /* minder dan half van de lengte */
+        this.collisionRadius = size * 0.8;
     }
 
     update() {
@@ -83,16 +76,10 @@ class Fish {
 
 function spawnFish() {
     const size = rand(5, 60);
+    /* grote vissen rood, kleine groen */
     const color = size < player.size ? 'green' : 'red';
-
-    let x, y;
-    const fishRadius = size * 0.5;
-    const minDist = player.collisionRadius + fishRadius + 50;
-    do {
-        x = rand(0, WIDTH);
-        y = rand(0, HEIGHT);
-    } while (Math.hypot(x - player.x, y - player.y) < minDist);
-
+    const x = rand(0, WIDTH);
+    const y = rand(0, HEIGHT);
     const speed = rand(0.5, 2);
     const dir = rand(0, Math.PI * 2);
     fishes.push(new Fish(x, y, size, speed, color, dir));
@@ -108,7 +95,7 @@ function resetGame() {
     player.size = 20;
     player.speed = 3;
     player.dir = 0;
-    player.collisionRadius = player.size * 0.5;
+    player.collisionRadius = player.size * 0.8;
     restartBtn.style.display = 'none';
     gameLoop(); /* start de animatie opnieuw */
 }
@@ -139,7 +126,7 @@ function checkCollisions() {
         const dx = f.x - player.x;
         const dy = f.y - player.y;
         const dist = Math.hypot(dx, dy);
-        /* gebruik kleinere straal voor botsing */
+        // gebruik kleinere straal voor botsing
         if (dist < f.collisionRadius + player.collisionRadius) {
             /*botsing */
             if (f.size < player.size) {
@@ -148,7 +135,7 @@ function checkCollisions() {
                 score += Math.floor(f.size);
                 /* groei een beetje*/
                 player.size += f.size * 0.05;
-                player.collisionRadius = player.size * 0.5;
+                player.collisionRadius = player.size * 0.8;
             } else {
                 /* gegeten door grotere vis */
                 gameOver = true;
@@ -209,7 +196,6 @@ function drawGameOver() {
     ctx.fillText('Game Over', WIDTH / 2, HEIGHT / 2 - 20);
     ctx.font = '20px sans-serif';
     ctx.fillText('Final Score: ' + score, WIDTH / 2, HEIGHT / 2 + 20);
-    /* positioneer knop opnieuw (in geval canvas is verplaatst) */
     /* laat de herstartknop zien */
     restartBtn.style.display = 'block';
 }
@@ -253,7 +239,7 @@ window.addEventListener('keyup', e => {
     keys[e.key] = false;
 });
 
-/* Spawntijd vis elke 1,5 sec */
-setInterval(spawnFish, 1500);
+/* Spawn vis elke seconde */
+setInterval(spawnFish, 1000);
  
 gameLoop();
