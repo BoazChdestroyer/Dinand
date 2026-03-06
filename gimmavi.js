@@ -12,7 +12,8 @@ const player = {
     y: HEIGHT / 2,
     size: 20,
     speed: 3,
-    color: 'blue'
+    color: 'blue',
+    dir: 0 /* kijkrichting in radialen, 0 = naar rechts */
 };
 
 let score = 0;
@@ -43,7 +44,7 @@ class Fish {
         /* bewegen in huidige richting */
         this.x += Math.cos(this.dir) * this.speed;
         this.y += Math.sin(this.dir) * this.speed;
-        // bounce off walls
+        /* terugkomen aan de andere kant als je de rand passeert */
         if (this.x < -this.size) this.x = WIDTH + this.size;
         if (this.x > WIDTH + this.size) this.x = -this.size;
         if (this.y < -this.size) this.y = HEIGHT + this.size;
@@ -51,10 +52,7 @@ class Fish {
     }
 
     draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.fill();
+        drawFish(this.x, this.y, this.size, this.color, this.dir);
     }
 }
 
@@ -70,12 +68,21 @@ function spawnFish() {
 }
 
 function updatePlayer() {
-    if (keys['ArrowUp'] || keys['w']) player.y -= player.speed;
-    if (keys['ArrowDown'] || keys['s']) player.y += player.speed;
-    if (keys['ArrowLeft'] || keys['a']) player.x -= player.speed;
-    if (keys['ArrowRight'] || keys['d']) player.x += player.speed;
+    /* beweging en oriëntatie bijhouden */
+    let dx = 0, dy = 0;
+    if (keys['ArrowUp'] || keys['w']) dy -= player.speed;
+    if (keys['ArrowDown'] || keys['s']) dy += player.speed;
+    if (keys['ArrowLeft'] || keys['a']) dx -= player.speed;
+    if (keys['ArrowRight'] || keys['d']) dx += player.speed;
 
-    /*binnen cnavas houden */
+    if (dx !== 0 || dy !== 0) {
+        player.dir = Math.atan2(dy, dx);
+    }
+
+    player.x += dx;
+    player.y += dy;
+
+    /* binnen canvas houden */
     player.x = Math.max(player.size, Math.min(WIDTH - player.size, player.x));
     player.y = Math.max(player.size, Math.min(HEIGHT - player.size, player.y));
 }
@@ -102,11 +109,41 @@ function checkCollisions() {
     }
 }
 
-function drawPlayer() {
+/* helper om een vis te tekenen met een simpel lijfje, staart en oog */
+function drawFish(x, y, size, color, dir) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(dir);
+
+    /* lijf (ellips) */
     ctx.beginPath();
-    ctx.arc(player.x, player.y, player.size, 0, Math.PI * 2);
-    ctx.fillStyle = player.color;
+    ctx.ellipse(0, 0, size, size / 1.8, 0, 0, Math.PI * 2);
+    ctx.fillStyle = color;
     ctx.fill();
+
+    /* staart */
+    ctx.beginPath();
+    ctx.moveTo(-size, 0);
+    ctx.lineTo(-size - size / 2, -size / 2);
+    ctx.lineTo(-size - size / 2, size / 2);
+    ctx.closePath();
+    ctx.fill();
+
+    /* oog */
+    ctx.beginPath();
+    ctx.arc(size * 0.4, -size * 0.2, size * 0.1, 0, Math.PI * 2);
+    ctx.fillStyle = 'white';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(size * 0.4, -size * 0.2, size * 0.05, 0, Math.PI * 2);
+    ctx.fillStyle = 'black';
+    ctx.fill();
+
+    ctx.restore();
+}
+
+function drawPlayer() {
+    drawFish(player.x, player.y, player.size, player.color, player.dir);
 }
 
 function drawScore() {
