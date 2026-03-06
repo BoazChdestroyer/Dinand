@@ -14,7 +14,7 @@ const player = {
     speed: 3,
     color: 'blue',
     dir: 0 /* kijkrichting in radialen, 0 = naar rechts */,
-    collisionRadius: 20 * 0.5 /* veel kleiner dan echt lijf, zorgt voor strengere botsing */
+    collisionRadius: 20 * 0.5 
 };
 
 let score = 0;
@@ -23,19 +23,21 @@ let gameOver = false;
 /* knop om opnieuw te spelen */
 const restartBtn = document.createElement('button');
 restartBtn.textContent = 'Play Again';
-restartBtn.style.position = 'absolute';
 restartBtn.style.padding = '10px 20px';
 restartBtn.style.fontSize = '20px';
 restartBtn.style.display = 'none';
-/* plaats knop onder de score (score wordt getekend op 10,30 in canvas) */
-function positionRestartBtn() {
-    const rect = canvas.getBoundingClientRect();
-    restartBtn.style.left = rect.left + 10 + 'px';
-    restartBtn.style.top = rect.top + 40 + 'px';
-}
-window.addEventListener('resize', positionRestartBtn);
-positionRestartBtn();
-document.body.appendChild(restartBtn);
+
+/* play again knop locatie */
+const wrapper = document.createElement('div');
+wrapper.style.position = 'relative';
+wrapper.style.display = 'inline-block';
+canvas.parentNode.insertBefore(wrapper, canvas);
+wrapper.appendChild(canvas);
+wrapper.appendChild(restartBtn);
+
+restartBtn.style.position = 'absolute';
+restartBtn.style.left = '10px';
+restartBtn.style.top = '40px';
 
 restartBtn.addEventListener('click', () => {
     resetGame();
@@ -81,7 +83,7 @@ class Fish {
 
 function spawnFish() {
     const size = rand(5, 60);
-    const color = Math.random() < 0.25 ? 'green' : 'red';
+    const color = size < player.size ? 'green' : 'red';
 
     let x, y;
     const fishRadius = size * 0.5;
@@ -108,7 +110,6 @@ function resetGame() {
     player.dir = 0;
     player.collisionRadius = player.size * 0.5;
     restartBtn.style.display = 'none';
-    positionRestartBtn();
     gameLoop(); /* start de animatie opnieuw */
 }
 
@@ -209,7 +210,6 @@ function drawGameOver() {
     ctx.font = '20px sans-serif';
     ctx.fillText('Final Score: ' + score, WIDTH / 2, HEIGHT / 2 + 20);
     /* positioneer knop opnieuw (in geval canvas is verplaatst) */
-    positionRestartBtn();
     /* laat de herstartknop zien */
     restartBtn.style.display = 'block';
 }
