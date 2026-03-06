@@ -14,7 +14,7 @@ const player = {
     speed: 3,
     color: 'blue',
     dir: 0 /* kijkrichting in radialen, 0 = naar rechts */,
-    collisionRadius: 20 * 0.8 /* iets kleiner dan echt lijf */
+    collisionRadius: 20 * 0.5 /* veel kleiner dan echt lijf, zorgt voor strengere botsing */
 };
 
 let score = 0;
@@ -24,12 +24,17 @@ let gameOver = false;
 const restartBtn = document.createElement('button');
 restartBtn.textContent = 'Play Again';
 restartBtn.style.position = 'absolute';
-restartBtn.style.left = '50%';
-restartBtn.style.top = '60%';
-restartBtn.style.transform = 'translate(-50%, -50%)';
 restartBtn.style.padding = '10px 20px';
 restartBtn.style.fontSize = '20px';
 restartBtn.style.display = 'none';
+/* plaats knop onder de score (score wordt getekend op 10,30 in canvas) */
+function positionRestartBtn() {
+    const rect = canvas.getBoundingClientRect();
+    restartBtn.style.left = rect.left + 10 + 'px';
+    restartBtn.style.top = rect.top + 40 + 'px';
+}
+window.addEventListener('resize', positionRestartBtn);
+positionRestartBtn();
 document.body.appendChild(restartBtn);
 
 restartBtn.addEventListener('click', () => {
@@ -55,7 +60,7 @@ class Fish {
         this.speed = speed;
         this.color = color;
         this.dir = direction;
-        this.collisionRadius = size * 0.8;
+        this.collisionRadius = size * 0.5; /* minder dan half van de lengte */
     }
 
     update() {
@@ -78,8 +83,15 @@ function spawnFish() {
     const size = rand(5, 60);
     /* grote vissen rood, kleine groen */
     const color = size < player.size ? 'green' : 'red';
-    const x = rand(0, WIDTH);
-    const y = rand(0, HEIGHT);
+
+    /* kies een positie die niet op of vlakbij de speler verschijntt, zodat je niet meteen wordt opgeslokt */
+    let x, y;
+    const minDist = player.collisionRadius + size * 0.5 + 20; /* 20px extra ruimte */
+    do {
+        x = rand(0, WIDTH);
+        y = rand(0, HEIGHT);
+    } while (Math.hypot(x - player.x, y - player.y) < minDist);
+
     const speed = rand(0.5, 2);
     const dir = rand(0, Math.PI * 2);
     fishes.push(new Fish(x, y, size, speed, color, dir));
@@ -95,7 +107,7 @@ function resetGame() {
     player.size = 20;
     player.speed = 3;
     player.dir = 0;
-    player.collisionRadius = player.size * 0.8;
+    player.collisionRadius = player.size * 0.5;
     restartBtn.style.display = 'none';
     gameLoop(); /* start de animatie opnieuw */
 }
@@ -126,7 +138,7 @@ function checkCollisions() {
         const dx = f.x - player.x;
         const dy = f.y - player.y;
         const dist = Math.hypot(dx, dy);
-        // gebruik kleinere straal voor botsing
+        /* gebruik kleinere straal voor botsing */
         if (dist < f.collisionRadius + player.collisionRadius) {
             /*botsing */
             if (f.size < player.size) {
@@ -135,7 +147,7 @@ function checkCollisions() {
                 score += Math.floor(f.size);
                 /* groei een beetje*/
                 player.size += f.size * 0.05;
-                player.collisionRadius = player.size * 0.8;
+                player.collisionRadius = player.size * 0.5;
             } else {
                 /* gegeten door grotere vis */
                 gameOver = true;
