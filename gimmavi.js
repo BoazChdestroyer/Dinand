@@ -186,6 +186,15 @@ function circleCollision(x1, y1, r1, x2, y2, r2) {
     const dist = Math.hypot(dx, dy);
     return dist < r1 + r2;
 }
+function updateFishColors() {
+    fishes.forEach(f => {
+        if (f.size < player.size) {
+            f.color = 'green'; /*eetbaar*/
+        } else {
+            f.color = 'red'; /*gevaarlijk*/
+        }
+    });
+}
 
 function checkCollisions() {
     for (let i = fishes.length - 1; i >= 0; i--) {
@@ -198,7 +207,7 @@ function checkCollisions() {
             player.collisionRadius,
             f.x,
             f.y,
-            f.size * 0.45
+            f.size * 0.55
         );
 
         /* STAART hitbox (achter de vis) */
@@ -305,10 +314,12 @@ function gameLoop() {
 
     updatePlayer();
 
-    fishes.forEach(f => {
-        f.update();
-        f.draw();
-    });
+    updateFishColors(); /* kleur aanpassen op basis van nieuwe grootte */
+
+fishes.forEach(f => {
+    f.update();
+    f.draw();
+});
 
     drawPlayer();
     drawScore();
