@@ -260,7 +260,7 @@ function drawScore() {
     ctx.fillStyle = 'black';
     ctx.font = '20px sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText('Score: ' + score, 10, 50);
+    ctx.fillText('Score: ' + score, 10, 60);
 }
 
 function drawGameOver() {
