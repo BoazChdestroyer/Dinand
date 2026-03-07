@@ -107,22 +107,20 @@ function spawnFish() {
     if (side === 0) {          /* links buiten scherm */
         x = -size;
         y = rand(0, HEIGHT);
+        dir = rand(-Math.PI / 4, Math.PI / 4); /* richting rechts */
     } else if (side === 1) {   /* rechts buiten scherm */
         x = WIDTH + size;
         y = rand(0, HEIGHT);
+        dir
     } else if (side === 2) {   /* boven buiten scherm */
         x = rand(0, WIDTH);
         y = -size;
+        dir = rand(Math.PI / 4, (3 * Math.PI) / 4); /* richting naar beneden */
     } else {                   /* onder buiten scherm */    
         x = rand(0, WIDTH);
         y = HEIGHT + size;
+        dir = rand((5 * Math.PI) / 4, (7 * Math.PI) / 4); /* richting naar boven */
     }
-
-    /* richting ongeveer naar het midden van het scherm */
-    const targetX = WIDTH / 2;
-    const targetY = HEIGHT / 2;
-    const dir = Math.atan2(targetY - y, targetX - x);
-
     const speed = rand(0.5, 2);
 
     fishes.push(new Fish(x, y, size, speed, color, dir));
