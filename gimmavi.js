@@ -180,27 +180,55 @@ function updatePlayer() {
     player.x = Math.max(player.size, Math.min(WIDTH - player.size, player.x));
     player.y = Math.max(player.size, Math.min(HEIGHT - player.size, player.y));
 }
+function circleCollision(x1, y1, r1, x2, y2, r2) {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const dist = Math.hypot(dx, dy);
+    return dist < r1 + r2;
+}
 
 function checkCollisions() {
     for (let i = fishes.length - 1; i >= 0; i--) {
         const f = fishes[i];
-        const dx = f.x - player.x;
-        const dy = f.y - player.y;
-        const dist = Math.hypot(dx, dy);
-        /* gebruik kleinere straal voor botsing */
-        if (dist < f.collisionRadius + player.collisionRadius) {
-            /* botsing */
+
+        /* BODY hitbox */
+        const bodyHit = circleCollision(
+            player.x,
+            player.y,
+            player.collisionRadius,
+            f.x,
+            f.y,
+            f.size * 0.45
+        );
+
+        /* STAART hitbox (achter de vis) */
+        const tailX = f.x - Math.cos(f.dir) * f.size;
+        const tailY = f.y - Math.sin(f.dir) * f.size;
+
+        const tailHit = circleCollision(
+            player.x,
+            player.y,
+            player.collisionRadius,
+            tailX,
+            tailY,
+            f.size * 0.25
+        );
+
+        if (bodyHit || tailHit) {
+
             if (f.size < player.size) {
-                /* eet de vis */
                 fishes.splice(i, 1);
+
                 score += Math.floor(f.size);
-                /* groei een beetje */
+
                 player.size += f.size * 0.08;
-                player.collisionRadius = player.size * 0.8; /* zelfde verhouding houden */
+
+                player.collisionRadius = player.size * 0.55;
+
             } else {
-                /* gegeten door grotere vis */
+
                 gameOver = true;
-                /* stoppen met vissen spawnen */
+
                 if (spawnIntervalId !== null) {
                     clearInterval(spawnIntervalId);
                 }
@@ -208,7 +236,6 @@ function checkCollisions() {
         }
     }
 }
-
 /* helper om een vis te tekenen met een simpel lijfje, staart en oog */
 function drawFish(x, y, size, color, dir) {
     ctx.save();
