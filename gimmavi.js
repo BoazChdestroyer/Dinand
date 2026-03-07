@@ -101,38 +101,30 @@ function spawnFish() {
         color = 'red';
     }
 
-    /* spawn op een plek die NIET op of vlakbij de speler is */
-    let x, y;
-    const minDist = player.size * 3;
-    for (let i = 0; i < 30; i++) {
-        x = rand(0, WIDTH);
+  /* kies een random rand waar de vis buiten spawnt */
+    const side = Math.floor(Math.random() * 4);
+
+    if (side === 0) {          /* links buiten scherm */
+        x = -size;
         y = rand(0, HEIGHT);
-        const dist = Math.hypot(x - player.x, y - player.y);
-        if (dist >= minDist) break;
+    } else if (side === 1) {   /* rechts buiten scherm */
+        x = WIDTH + size;
+        y = rand(0, HEIGHT);
+    } else if (side === 2) {   /* boven buiten scherm */
+        x = rand(0, WIDTH);
+        y = -size;
+    } else {                   /* onder buiten scherm */    
+        x = rand(0, WIDTH);
+        y = HEIGHT + size;
     }
 
-    /* extra harde check: als het na alle pogingen nog te dichtbij is, verschuif hem naar de rand */
-    let finalDist = Math.hypot(x - player.x, y - player.y);
-    if (finalDist < minDist) {
-        /* zet hem aan een willekeurige rand van de canvas */
-        const side = Math.floor(Math.random() * 4);
-        if (side === 0) {        /* links */
-            x = 0;
-            y = rand(0, HEIGHT);
-        } else if (side === 1) { /* rechts */
-            x = WIDTH;
-            y = rand(0, HEIGHT);
-        } else if (side === 2) { /* boven */
-            x = rand(0, WIDTH);
-            y = 0;
-        } else {                 /* onder */
-            x = rand(0, WIDTH);
-            y = HEIGHT;
-        }
-    }
+    /* richting ongeveer naar het midden van het scherm */
+    const targetX = WIDTH / 2;
+    const targetY = HEIGHT / 2;
+    const dir = Math.atan2(targetY - y, targetX - x);
 
     const speed = rand(0.5, 2);
-    const dir = rand(0, Math.PI * 2);
+
     fishes.push(new Fish(x, y, size, speed, color, dir));
 }
 
