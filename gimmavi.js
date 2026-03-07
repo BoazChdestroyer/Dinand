@@ -3,7 +3,7 @@ const ctx = canvas.getContext('2d');
 
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
-
+let gameWon = false;
 /* speler-vis */
 const player = {
     x: WIDTH / 2,
@@ -145,6 +145,7 @@ function resetKeys() {
 function resetGame() {
     score = 0;
     gameOver = false;
+    gameWon = false;
     fishes.length = 0; /* bestaande vissen verwijderen */
     player.x = WIDTH / 2;
     player.y = HEIGHT / 2;
@@ -207,7 +208,7 @@ function checkCollisions() {
             player.collisionRadius,
             f.x,
             f.y,
-            f.size * 0.55
+            f.size * 0.6
         );
 
         /* STAART hitbox (achter de vis) */
@@ -220,7 +221,7 @@ function checkCollisions() {
             player.collisionRadius,
             tailX,
             tailY,
-            f.size * 0.25
+            f.size * 0.35
         );
 
         if (bodyHit || tailHit) {
@@ -303,10 +304,30 @@ function drawGameOver() {
     restartBtn.style.display = 'block';
     positionRestartButton();
 }
+function drawWin() {
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+    ctx.fillStyle = 'white';
+    ctx.font = '40px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('You Won!', WIDTH / 2, HEIGHT / 2 - 20);
+
+    ctx.font = '20px sans-serif';
+    ctx.fillText('Final Score: ' + score, WIDTH / 2, HEIGHT / 2 + 20);
+
+    restartBtn.style.display = 'block';
+    positionRestartButton();
+}
 
 function gameLoop() {
     if (gameOver) {
         drawGameOver();
+        return;
+    }
+
+    if (gameWon) {
+        drawWin();
         return;
     }
 
@@ -324,8 +345,21 @@ fishes.forEach(f => {
     drawPlayer();
     drawScore();
     checkCollisions();
+    checkWin();
 
     requestAnimationFrame(gameLoop);
+}
+/* controleren of er nog rode vissen zijn, en zo niet, dan winnen */
+function checkWin() {
+    const redFishExists = fishes.some(f => f.size >= player.size);
+
+    if (!redFishExists && fishes.length > 0) {
+        gameWon = true;
+
+        if (spawnIntervalId !== null) {
+            clearInterval(spawnIntervalId);
+        }
+    }
 }
 
 /* key events */
