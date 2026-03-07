@@ -28,9 +28,9 @@ restartBtn.style.padding = '10px 20px';
 restartBtn.style.fontSize = '20px';
 restartBtn.style.display = 'none';
 restartBtn.style.cursor = 'pointer';
+restartBtn.style.zIndex = '10';
 document.body.appendChild(restartBtn);
 restartBtn.addEventListener('click', () => resetGame());
-
 function positionRestartButton() {
     const rect = canvas.getBoundingClientRect();
     const btnWidth = restartBtn.offsetWidth;
@@ -38,13 +38,11 @@ function positionRestartButton() {
     /* horizontaal in het midden van de canvas */
     restartBtn.style.left = rect.left + rect.width / 2 - btnWidth / 2 + 'px';
 
-    /* precies onder de “Final Score”-tekst (die staat op HEIGHT / 2 + 20) */
+    /* precies onder de “Final Score”tekst */
     const centerY = rect.top + rect.height / 2;
-    /* wat extra marge eronder voor de knop */
     restartBtn.style.top = centerY + 50 + 'px';
 }
-
-/* bij resize de knop opnieuw goed zetten als hij zichtbaar is */
+/* resize */
 window.addEventListener('resize', () => {
     if (restartBtn.style.display === 'block') {
         positionRestartButton();
@@ -105,7 +103,7 @@ function spawnFish() {
 
     /* spawn op een plek die NIET op of vlakbij de speler is */
     let x, y;
-    const minDist = player.size * 3; /* iets grotere veilige afstand */
+    const minDist = player.size * 3;
     for (let i = 0; i < 30; i++) {
         x = rand(0, WIDTH);
         y = rand(0, HEIGHT);
@@ -157,7 +155,7 @@ function resetKeys() {
 function resetGame() {
     score = 0;
     gameOver = false;
-    fishes.length = 0; /* leeg array */
+    fishes.length = 0; /* bestaande vissen verwijderen */
     player.x = WIDTH / 2;
     player.y = HEIGHT / 2;
     player.size = 20;
@@ -169,7 +167,8 @@ function resetGame() {
     restartBtn.style.display = 'none'; /* herstartknop verbergen */
 
     startSpawningFish(); /* weer vissen spawnen */
-    /* gameLoop NIET opnieuw aanroepen; die draait al via requestAnimationFrame */
+    gameLoop(); /* game loop opnieuw starten */
+    
 }
 
 function updatePlayer() {
@@ -226,7 +225,7 @@ function drawFish(x, y, size, color, dir) {
     ctx.translate(x, y);
     ctx.rotate(dir);
 
-    /* lijf (ellips) */
+    /* lijf */
     ctx.beginPath();
     ctx.ellipse(0, 0, size, size / 1.8, 0, 0, Math.PI * 2);
     ctx.fillStyle = color;
@@ -261,7 +260,7 @@ function drawScore() {
     ctx.fillStyle = 'black';
     ctx.font = '20px sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText('Score: ' + score, 10, 30);
+    ctx.fillText('Score: ' + score, 10, 50);
 }
 
 function drawGameOver() {
