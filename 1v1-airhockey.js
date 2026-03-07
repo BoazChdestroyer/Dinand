@@ -38,6 +38,26 @@ function beweegPuck() {
 }    
 }
 
+function checkCollisions() {
+      [p1, p2].forEach(player => {
+            const dx = puck.x - player.x;
+            const dy = puck.y - player.y;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+
+            if(dist < puck.r + player.r) {
+                  const angle = Math.atan2(dy, dx);
+                  const speed = Math.sqrt(puck.vx*puck.vx + puck.vy*puck.vy) + 2;               
+
+
+
+                  puck.vx = Math.cos(angle) * speed;
+                  puck.vy = Math.sin(angle) * speed;
+            }
+      });
+}
+
+function checkScore() {
+
 
 
     
