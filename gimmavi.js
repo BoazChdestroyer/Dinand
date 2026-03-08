@@ -1,5 +1,6 @@
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
+
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
 let gameWon = false;
@@ -124,7 +125,6 @@ class Bubble {
 function spawnFish() {
     /* 30% kans op kleine groene vis, 70% kans op grote rode vis */
     let size, color;
-    let x, y, dir;
     if (Math.random() < 0.3) {
         /* kleine groene vis: grootte kleiner dan speler maar minstens 5 */
         size = rand(5, Math.max(5, player.size - 1));
@@ -365,7 +365,8 @@ function gameLoop() {
         return;
     }
 
-
+    ctx.clearRect(0, 0, WIDTH, HEIGHT);
+    
 bubbles.forEach(b => {
     b.update();
     b.draw();
