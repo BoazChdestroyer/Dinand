@@ -12,13 +12,14 @@ const player = {
     speed: 3,
     color: 'blue',
     dir: 0, /* kijkrichting in radialen, 0 = naar rechts */
-    collisionRadius: 20 * 0.8 /* botsingscirkel, iets kleiner dan lijf */
+    collisionRadius: 20 * 0.55 /* botsingscirkel, iets kleiner dan lijf */
 };
 
 let score = 0;
 let gameOver = false;
 /* interval-id voor vissen spawnen, zodat we die kunnen stoppen en opnieuw starten */
 let spawnIntervalId = null;
+let gamesStarted = false;
 
 /* herstartknop maken, maar verbergen tot game over */
 const restartBtn = document.createElement('button');
@@ -47,6 +48,29 @@ window.addEventListener('resize', () => {
     if (restartBtn.style.display === 'block') {
         positionRestartButton();
     }
+});
+
+const startBtn = document.createElement('button'); /* startknop maken */
+startBtn.textContent = 'Start Game';
+startBtn.style.position = 'absolute';
+startBtn.style.padding = '10px 20px';
+startBtn.style.fontSize = '20px';
+startBtn.style.cursor = 'pointer';
+startBtn.style.zIndex = '10';
+document.body.appendChild(startBtn);
+
+function positionStartButton() { /* positioneer de startknop in het midden van de canvas */
+    const rect = canvas.getBoundingClientRect();
+    const btnWidth = startBtn.offsetWidth;
+
+    startBtn.style.left = rect.left + rect.width / 2 - btnWidth / 2 + 'px';
+    startBtn.style.top = rect.top + rect.height / 2 + 'px';
+}
+
+startBtn.addEventListener('click', () => {
+    gameStarted = true;
+    startBtn.style.display = 'none';
+    startSpawningFish();
 });
 
 /* andere random vissen */
@@ -91,6 +115,7 @@ class Fish {
 function spawnFish() {
     /* 30% kans op kleine groene vis, 70% kans op grote rode vis */
     let size, color;
+    let x, y, dir;
     if (Math.random() < 0.3) {
         /* kleine groene vis: grootte kleiner dan speler maar minstens 5 */
         size = rand(5, Math.max(5, player.size - 1));
@@ -111,7 +136,7 @@ function spawnFish() {
     } else if (side === 1) {   /* rechts buiten scherm */
         x = WIDTH + size;
         y = rand(0, HEIGHT);
-        dir
+        dir = rand((3 * Math.PI) / 4, (5 * Math.PI) / 4); /* richting links */
     } else if (side === 2) {   /* boven buiten scherm */
         x = rand(0, WIDTH);
         y = -size;
@@ -319,8 +344,26 @@ function drawWin() {
     restartBtn.style.display = 'block';
     positionRestartButton();
 }
+function drawStartScreen() {
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
+    ctx.fillStyle = 'white';
+    ctx.font = '40px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Fish Game', WIDTH / 2, HEIGHT / 2 - 40);
+
+    ctx.font = '20px sans-serif';
+    ctx.fillText('Eat smaller fish and avoid bigger ones', WIDTH / 2, HEIGHT / 2 - 10);
+
+    startBtn.style.display = 'block';
+    positionStartButton();
+}
 function gameLoop() {
+    if (!gameStarted) {
+        drawStartScreen();
+        return;
+    }
     if (gameOver) {
         drawGameOver();
         return;
@@ -381,5 +424,4 @@ window.addEventListener('keyup', e => {
 });
 
 /* start: vissen spawnen en game loop starten */
-startSpawningFish();
 gameLoop();
