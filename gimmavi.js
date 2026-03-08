@@ -51,7 +51,7 @@ window.addEventListener('resize', () => {
 
 /* andere random vissen */
 const fishes = [];
-
+const bubbles = [];
 /* toetsen die ingedrukt zijn */
 const keys = {};
 
@@ -86,7 +86,41 @@ class Fish {
         drawFish(this.x, this.y, this.size, this.color, this.dir);
     }
 }
+class Bubble {
+    constructor() {
+        this.x = rand(0, WIDTH);
+        this.y = HEIGHT + rand(0, 100);
+        this.size = rand(2, 6);
+        this.speed = rand(0.5, 1.5);
+        this.wobble = rand(0, Math.PI * 2);
+    }
 
+    update() {
+        this.y -= this.speed;
+
+        /* kleine zijwaartse beweging */
+        this.x += Math.sin(this.wobble) * 0.3;
+        this.wobble += 0.05;
+
+        /* reset als bubbel boven uit beeld gaat */
+        if (this.y < -10) {
+            this.x = rand(0, WIDTH);
+            this.y = HEIGHT + rand(20, 100);
+        }
+    }
+
+    draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(255,255,255,0.7)";
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(this.x - this.size * 0.3, this.y - this.size * 0.3, this.size * 0.3, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,255,255,0.4)";
+        ctx.fill();
+    }
+}
 /* vissen spawnen (klein/groen of groot/rood) */
 function spawnFish() {
     /* 30% kans op kleine groene vis, 70% kans op grote rode vis */
@@ -111,7 +145,7 @@ function spawnFish() {
     } else if (side === 1) {   /* rechts buiten scherm */
         x = WIDTH + size;
         y = rand(0, HEIGHT);
-        dir
+        dir = rand((3 * Math.PI) / 4, (5 * Math.PI) / 4); /* richting links */
     } else if (side === 2) {   /* boven buiten scherm */
         x = rand(0, WIDTH);
         y = -size;
@@ -332,7 +366,11 @@ function gameLoop() {
     }
 
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
-
+    
+bubbles.forEach(b => {
+    b.update();
+    b.draw();
+});
     updatePlayer();
 
     updateFishColors(); /* kleur aanpassen op basis van nieuwe grootte */
@@ -341,6 +379,7 @@ fishes.forEach(f => {
     f.update();
     f.draw();
 });
+
 
     drawPlayer();
     drawScore();
@@ -351,9 +390,13 @@ fishes.forEach(f => {
 }
 /* controleren of er nog rode vissen zijn, en zo niet, dan winnen */
 function checkWin() {
+
+    if (fishes.length < 5) return;
+
     const redFishExists = fishes.some(f => f.size >= player.size);
 
-    if (!redFishExists && fishes.length > 0) {
+    if (!redFishExists) {
+
         gameWon = true;
 
         if (spawnIntervalId !== null) {
@@ -379,7 +422,9 @@ window.addEventListener('keydown', e => {
 window.addEventListener('keyup', e => {
     keys[e.key] = false;
 });
-
+for (let i = 0; i < 25; i++) {
+    bubbles.push(new Bubble());
+}
 /* start: vissen spawnen en game loop starten */
 startSpawningFish();
 gameLoop();
