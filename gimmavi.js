@@ -1,6 +1,7 @@
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
-
+const background = new Image();
+background.src = "oceaan.jpg";
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
 let gameWon = false;
@@ -365,8 +366,8 @@ function gameLoop() {
         return;
     }
 
-    ctx.clearRect(0, 0, WIDTH, HEIGHT);
-    
+    ctx.drawImage(background, 0, 0, WIDTH, HEIGHT);
+
 bubbles.forEach(b => {
     b.update();
     b.draw();
