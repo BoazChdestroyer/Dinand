@@ -126,6 +126,7 @@ class Bubble {
 function spawnFish() {
     /* 30% kans op kleine groene vis, 70% kans op grote rode vis */
     let size, color;
+    let x, y, dir;
     if (Math.random() < 0.3) {
         /* kleine groene vis: grootte kleiner dan speler maar minstens 5 */
         size = rand(5, Math.max(5, player.size - 1));
@@ -427,5 +428,6 @@ for (let i = 0; i < 25; i++) {
     bubbles.push(new Bubble());
 }
 /* start: vissen spawnen en game loop starten */
+background.onload = function() {
 startSpawningFish();
 gameLoop();
