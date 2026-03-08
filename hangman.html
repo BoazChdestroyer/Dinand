@@ -2,10 +2,12 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hangman</title>
 <style>
-body {
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     background: #0f172a;
     color: #e2e8f0;
@@ -15,13 +17,22 @@ body {
     align-items: center;
   }
 
+  .game-container {
+    background: #1e293b;
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 25px 60px rgba(0,0,0,.4);
+    text-align: center;
+  }
+
   h1 {
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 8px;
-    background: linear-gradient(135deg, #128b49, #818cf8);
+    background: linear-gradient(135deg, #38bdf8, #818cf8);
     -webkit-background-clip: text;
-    background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
@@ -35,13 +46,121 @@ body {
     background: #0f172a;
     border-radius: 12px;
     display: block;
-    margin-bottom: 0 auto 24px;
+    margin: 0 auto 24px;
+  }
+
+  .word-display {
+    font-size: 2rem;
+    letter-spacing: .6em;
+    font-weight: 700;
+    margin-bottom: 24px;
+    min-height: 3rem;
+    color: #f1f5f9;
+    font-family: 'Courier New', monospace;
+  }
+
+  .keyboard {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+
+  .keyboard button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 8px;
+    background: #334155;
+    color: #e2e8f0;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+
+  .keyboard button:hover:not(:disabled) {
+    background: #475569;
+    transform: translateY(-2px);
+  }
+
+  .keyboard button:disabled {
+    cursor: default;
+  }
+
+  .keyboard button.correct {
+    background: #16a34a;
+    color: #fff;
+  }
+
+  .keyboard button.wrong {
+    background: #dc2626;
+    color: #fff;
+    opacity: .5;
+  }
+
+  .status {
+    font-size: .95rem;
+    color: #94a3b8;
+    margin-bottom: 20px;
+    min-height: 1.5rem;
+  }
+
+  .message {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    min-height: 1.8rem;
+  }
+
+  .message.win  { color: #4ade80; }
+  .message.lose { color: #f87171; }
+
+  .new-game-btn {
+    background: linear-gradient(135deg, #38bdf8, #818cf8);
+    color: #0f172a;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 32px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+
+  .new-game-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(56,189,248,.3);
+  }
+
+  .button-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .home-btn {
+    background: linear-gradient(135deg, #f59e0b, #f30e0e);
+    color: #0f172a;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 32px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+
+  .home-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245,158,11,.3);
   }
 </style>
 </head>
 <body>
-
-<div class="game-container" padding="20px" border-radius="10px" box-shadow="0 4px 8px rgba(0, 0, 0, 0.1)" max-width="400px" margin="40px auto">
+<div class="game-container">
   <h1>Hangman</h1>
   <p class="subtitle">Raad het woord voordat het poppetje compleet is!</p>
 
@@ -51,9 +170,175 @@ body {
   <div class="status" id="status"></div>
   <div class="keyboard" id="keyboard"></div>
   <div class="message" id="message"></div>
-  <button class="new-game-btn" id="newGameBtn">Nieuw spel</button>
+  <div class="button-container">
+    <button class="new-game-btn" id="newGameBtn">Nieuw spel</button>
+    <button class="home-btn" onclick="window.location.href='index.html'">Terug naar start</button>
+  </div>
 </div>
 
+<script>
+const WORDS = [
+  "programmeren", "javascript", "hangman", "computer",
+  "toetsenbord", "scherm", "muis", "algoritme",
+  "functie", "variabele", "banaan", "spelletjes",
+  "Website", "appel","boom","informatica","auto",
+  "wielen","voetbal","aantal","paraplu","regenbui",
+  "huis","televisie","achtbaan","cirkel","pretpark",
+  "plezier","lachen","pannenkoek","ei","metaal","diamant",
+  "rijkdom",
+];
 
+const MAX_WRONG = 10;
+
+let word, guessed, wrongCount, gameOver;
+
+const canvas  = document.getElementById("gallows");
+const ctx     = canvas.getContext("2d");
+const wordEl  = document.getElementById("wordDisplay");
+const statusEl= document.getElementById("status");
+const msgEl   = document.getElementById("message");
+const kbEl    = document.getElementById("keyboard");
+const newBtn  = document.getElementById("newGameBtn");
+
+function pickWord() {
+  return WORDS[Math.floor(Math.random() * WORDS.length)].toUpperCase();
+}
+
+function buildKeyboard() {
+  kbEl.innerHTML = "";
+  for (let c = 65; c <= 90; c++) {
+    const letter = String.fromCharCode(c);
+    const btn = document.createElement("button");
+    btn.textContent = letter;
+    btn.dataset.letter = letter;
+    btn.addEventListener("click", () => guess(letter));
+    kbEl.appendChild(btn);
+  }
+}
+
+function updateWordDisplay() {
+  wordEl.textContent = word
+    .split("")
+    .map(ch => (guessed.has(ch) ? ch : "_"))
+    .join(" ");
+}
+
+function updateStatus() {
+  statusEl.textContent = `Foute pogingen: ${wrongCount} / ${MAX_WRONG}`;
+}
+
+function drawGallows(step) {
+  ctx.strokeStyle = "#94a3b8";
+  ctx.lineWidth   = 3;
+  ctx.lineCap     = "round";
+
+  const cx = 180, cy = 60, r = 18;
+
+  switch (step) {
+    case 1: // base
+      ctx.beginPath(); ctx.moveTo(20,240); ctx.lineTo(180,240); ctx.stroke();
+      break;
+    case 2: // pole
+      ctx.beginPath(); ctx.moveTo(60,240); ctx.lineTo(60,30); ctx.stroke();
+      break;
+    case 3: // top beam
+      ctx.beginPath(); ctx.moveTo(60,30); ctx.lineTo(cx,30); ctx.stroke();
+      break;
+    case 4: // rope
+      ctx.beginPath(); ctx.moveTo(cx,30); ctx.lineTo(cx,cy - r); ctx.stroke();
+      break;
+    case 5: // head
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+      break;
+    case 6: // body
+      ctx.beginPath(); ctx.moveTo(cx, cy + r); ctx.lineTo(cx, 160); ctx.stroke();
+      break;
+    case 7: // left arm
+      ctx.beginPath(); ctx.moveTo(cx, 100); ctx.lineTo(cx - 35, 130); ctx.stroke();
+      break;
+    case 8: // right arm
+      ctx.beginPath(); ctx.moveTo(cx, 100); ctx.lineTo(cx + 35, 130); ctx.stroke();
+      break;
+    case 9: // left leg
+      ctx.beginPath(); ctx.moveTo(cx, 160); ctx.lineTo(cx - 30, 210); ctx.stroke();
+      break;
+    case 10: // right leg
+      ctx.beginPath(); ctx.moveTo(cx, 160); ctx.lineTo(cx + 30, 210); ctx.stroke();
+      break;
+  }
+}
+
+function guess(letter) {
+  if (gameOver || guessed.has(letter)) return;
+  guessed.add(letter);
+
+  const btn = kbEl.querySelector(`[data-letter="${letter}"]`);
+
+  if (word.includes(letter)) {
+    btn.classList.add("correct");
+    btn.disabled = true;
+    updateWordDisplay();
+    checkWin();
+  } else {
+    btn.classList.add("wrong");
+    btn.disabled = true;
+    wrongCount++;
+    updateStatus();
+    drawGallows(wrongCount);
+    checkLose();
+  }
+}
+
+function checkWin() {
+  if (word.split("").every(ch => guessed.has(ch))) {
+    gameOver = true;
+    msgEl.textContent = "Gefeliciteerd, je hebt gewonnen! 🎉";
+    msgEl.className = "message win";
+    disableAllButtons();
+  }
+}
+
+function checkLose() {
+  if (wrongCount >= MAX_WRONG) {
+    gameOver = true;
+    msgEl.innerHTML = `Helaas, je hebt verloren! Het woord was: <strong>${word}</strong>`;
+    msgEl.className = "message lose";
+    revealWord();
+    disableAllButtons();
+  }
+}
+
+function revealWord() {
+  wordEl.textContent = word.split("").join(" ");
+}
+
+function disableAllButtons() {
+  kbEl.querySelectorAll("button").forEach(b => (b.disabled = true));
+}
+
+function startGame() {
+  word = pickWord();
+  guessed = new Set();
+  wrongCount = 0;
+  gameOver = false;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  msgEl.textContent = "";
+  msgEl.className = "message";
+
+  buildKeyboard();
+  updateWordDisplay();
+  updateStatus();
+}
+
+document.addEventListener("keydown", e => {
+  const key = e.key.toUpperCase();
+  if (key >= "A" && key <= "Z" && key.length === 1) guess(key);
+});
+
+newBtn.addEventListener("click", startGame);
+
+startGame();
+</script>
 </body>
 </html>

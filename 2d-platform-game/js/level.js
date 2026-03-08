@@ -291,6 +291,18 @@ function generateLevelData(levelNum) {
         const pc = randInt(5, cols - 10);
         const pr = randInt(4, rows - 4);
         const pw = randInt(2, 4);
+        
+        // Check if ANY cell is already occupied (not empty)
+        let cellAlreadyOccupied = false;
+        for (let i = 0; i < pw; i++) {
+            if (pc + i < cols && tiles[pr][pc + i] !== TILE_TYPES.EMPTY) {
+                cellAlreadyOccupied = true;
+                break;
+            }
+        }
+        if (cellAlreadyOccupied) continue;
+        
+        // Place the platform
         for (let i = 0; i < pw; i++) {
             if (pc + i < cols) {
                 tiles[pr][pc + i] = TILE_TYPES.PLATFORM;
@@ -302,9 +314,35 @@ function generateLevelData(levelNum) {
     const obstacleCount = 3 + Math.floor(levelNum / 4);
     for (let o = 0; o < obstacleCount; o++) {
         const oc = randInt(6, cols - 8);
-        if (gaps.includes(oc) || gaps.includes(oc + 1)) continue;
-        const oh = randInt(1, 2 + Math.floor(levelNum / 15));
         const ow = randInt(1, 3);
+        
+        // Check if ANY column of this obstacle is in a gap
+        let inGap = false;
+        for (let c = 0; c < ow; c++) {
+            if (gaps.includes(oc + c)) {
+                inGap = true;
+                break;
+            }
+        }
+        if (inGap) continue;
+        
+        // Check if ANY cell is already occupied (not empty)
+        const oh = Math.min(2, Math.floor(levelNum / 20) + 1); // Cap at 2 blocks max
+        let cellAlreadyOccupied = false;
+        for (let r = 0; r < oh; r++) {
+            for (let c = 0; c < ow; c++) {
+                const row = groundRow - 2 - r;
+                const col = oc + c;
+                if (row >= 0 && col < cols && tiles[row][col] !== TILE_TYPES.EMPTY) {
+                    cellAlreadyOccupied = true;
+                    break;
+                }
+            }
+            if (cellAlreadyOccupied) break;
+        }
+        if (cellAlreadyOccupied) continue;
+        
+        // Place the obstacle
         for (let r = 0; r < oh; r++) {
             for (let c = 0; c < ow; c++) {
                 const row = groundRow - 2 - r;
@@ -321,7 +359,7 @@ function generateLevelData(levelNum) {
         const spikeCount = Math.floor(levelNum / 4);
         for (let s = 0; s < spikeCount; s++) {
             const sc = randInt(8, cols - 6);
-            if (!gaps.includes(sc) && tiles[groundRow][sc] !== TILE_TYPES.EMPTY) {
+            if (!gaps.includes(sc) && tiles[groundRow][sc] !== TILE_TYPES.EMPTY && tiles[groundRow - 2][sc] === TILE_TYPES.EMPTY) {
                 tiles[groundRow - 2][sc] = TILE_TYPES.SPIKE;
             }
         }
