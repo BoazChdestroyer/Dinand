@@ -19,7 +19,7 @@ let score = 0;
 let gameOver = false;
 /* interval-id voor vissen spawnen, zodat we die kunnen stoppen en opnieuw starten */
 let spawnIntervalId = null;
-let gamesStarted = false;
+
 
 /* herstartknop maken, maar verbergen tot game over */
 const restartBtn = document.createElement('button');
@@ -50,28 +50,6 @@ window.addEventListener('resize', () => {
     }
 });
 
-const startBtn = document.createElement('button'); /* startknop maken */
-startBtn.textContent = 'Start Game';
-startBtn.style.position = 'absolute';
-startBtn.style.padding = '10px 20px';
-startBtn.style.fontSize = '20px';
-startBtn.style.cursor = 'pointer';
-startBtn.style.zIndex = '10';
-document.body.appendChild(startBtn);
-
-function positionStartButton() { /* positioneer de startknop in het midden van de canvas */
-    const rect = canvas.getBoundingClientRect();
-    const btnWidth = startBtn.offsetWidth;
-
-    startBtn.style.left = rect.left + rect.width / 2 - btnWidth / 2 + 'px';
-    startBtn.style.top = rect.top + rect.height / 2 + 'px';
-}
-
-startBtn.addEventListener('click', () => {
-    gameStarted = true;
-    startBtn.style.display = 'none';
-    startSpawningFish();
-});
 
 /* andere random vissen */
 const fishes = [];
@@ -279,31 +257,46 @@ function drawFish(x, y, size, color, dir) {
 
     /* lijf */
     ctx.beginPath();
-    ctx.ellipse(0, 0, size, size / 1.8, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, 0, size, size / 0.65, 0, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+
+    /* vin */
+    ctx.beginPath();
+    ctx.moveTo(-size * 0.2, -size * 0.65);
+    ctx.lineTo(size * 0.2, -size * 0.9);
+    ctx.lineTo(size * 0.5, -size * 0.65);
+    ctx.closePath();
     ctx.fillStyle = color;
     ctx.fill();
 
     /* staart */
     ctx.beginPath();
     ctx.moveTo(-size, 0);
-    ctx.lineTo(-size - size / 2, -size / 2);
-    ctx.lineTo(-size - size / 2, size / 2);
+    ctx.lineTo(-size - size * 0.65, -size * 0.5);
+    ctx.lineTo(-size - size * 0.65, size * 0.5);
     ctx.closePath();
     ctx.fill();
 
     /* oog */
-    ctx.beginPath();
-    ctx.arc(size * 0.4, -size * 0.2, size * 0.1, 0, Math.PI * 2);
-    ctx.fillStyle = 'white';
+  ctx.beginPath();
+    ctx.arc(size * 0.4, -size * 0.15, size * 0.18, 0, Math.PI * 2);
+    ctx.fillStyle = "white";
     ctx.fill();
+
     ctx.beginPath();
-    ctx.arc(size * 0.4, -size * 0.2, size * 0.05, 0, Math.PI * 2);
-    ctx.fillStyle = 'black';
+    ctx.arc(size * 0.45, -size * 0.15, size * 0.09, 0, Math.PI * 2);
+    ctx.fillStyle = "black";
+    ctx.fill();
+
+    /* oogschijn */
+    ctx.beginPath();
+    ctx.arc(size * 0.48, -size * 0.18, size * 0.03, 0, Math.PI * 2);
+    ctx.fillStyle = "white";
     ctx.fill();
 
     ctx.restore();
 }
-
 function drawPlayer() {
     drawFish(player.x, player.y, player.size, player.color, player.dir);
 }
@@ -344,26 +337,7 @@ function drawWin() {
     restartBtn.style.display = 'block';
     positionRestartButton();
 }
-function drawStartScreen() {
-    ctx.fillStyle = 'rgba(0,0,0,0.6)';
-    ctx.fillRect(0, 0, WIDTH, HEIGHT);
-
-    ctx.fillStyle = 'white';
-    ctx.font = '40px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('Fish Game', WIDTH / 2, HEIGHT / 2 - 40);
-
-    ctx.font = '20px sans-serif';
-    ctx.fillText('Eat smaller fish and avoid bigger ones', WIDTH / 2, HEIGHT / 2 - 10);
-
-    startBtn.style.display = 'block';
-    positionStartButton();
-}
 function gameLoop() {
-    if (!gameStarted) {
-        drawStartScreen();
-        return;
-    }
     if (gameOver) {
         drawGameOver();
         return;
@@ -394,9 +368,10 @@ fishes.forEach(f => {
 }
 /* controleren of er nog rode vissen zijn, en zo niet, dan winnen */
 function checkWin() {
+    if (fishes.length < 5) return; /* te vroeg om te winnen als er nog maar een paar vissen zijn */
     const redFishExists = fishes.some(f => f.size >= player.size);
 
-    if (!redFishExists && fishes.length > 0) {
+    if (!redFishExists) {
         gameWon = true;
 
         if (spawnIntervalId !== null) {
@@ -424,4 +399,5 @@ window.addEventListener('keyup', e => {
 });
 
 /* start: vissen spawnen en game loop starten */
+startSpawningFish
 gameLoop();
