@@ -56,8 +56,40 @@ function checkCollisions() {
       });
 }
 
-function checkScore() {
+function teken() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // speler 1
+    ctx.beginPath();
+    ctx.arc(p1.x, p1.y, p1.r, 0, Math.PI * 2);
+    ctx.fillStyle = "blue";
+    ctx.fill();
+    ctx.closePath();
+
+    // speler 2
+    ctx.beginPath();
+    ctx.arc(p2.x, p2.y, p2.r, 0, Math.PI * 2);
+    ctx.fillStyle = "red";
+    ctx.fill();
+    ctx.closePath();
+
+    // puck
+    ctx.beginPath();
+    ctx.arc(puck.x, puck.y, puck.r, 0, Math.PI * 2);
+    ctx.fillStyle = "black";
+    ctx.fill();
+    ctx.closePath();
+}
+
+function gameLoop() {
+    beweegPLayers();
+    beweegPuck();
+    checkCollisions();
+    teken();
+    requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
 
 
     
