@@ -79,8 +79,8 @@ function checkCollisions() {
 }
 
 function teken() {
-      ctx.fillStyle = "white";
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // middenlijn
     ctx.strokeStyle = "red";
