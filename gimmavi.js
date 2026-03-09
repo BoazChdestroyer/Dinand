@@ -1,35 +1,65 @@
-// simple canvas fish game where the player is a fish
-// eat smaller fish to grow, avoid larger fish
-
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
-
-// player fish
+let gameWon = false;
+/* speler-vis */
 const player = {
     x: WIDTH / 2,
     y: HEIGHT / 2,
     size: 20,
     speed: 3,
-    color: 'blue'
+    color: 'blue',
+    dir: 0, /* kijkrichting in radialen, 0 = naar rechts */
+    collisionRadius: 20 * 0.8 /* botsingscirkel, iets kleiner dan lijf */
 };
 
 let score = 0;
 let gameOver = false;
+/* interval-id voor vissen spawnen, zodat we die kunnen stoppen en opnieuw starten */
+let spawnIntervalId = null;
 
-// other fishes
+/* herstartknop maken, maar verbergen tot game over */
+const restartBtn = document.createElement('button');
+restartBtn.textContent = 'Play Again';
+restartBtn.style.position = 'absolute';
+restartBtn.style.padding = '10px 20px';
+restartBtn.style.fontSize = '20px';
+restartBtn.style.display = 'none';
+restartBtn.style.cursor = 'pointer';
+restartBtn.style.zIndex = '10';
+document.body.appendChild(restartBtn);
+restartBtn.addEventListener('click', () => resetGame());
+function positionRestartButton() {
+    const rect = canvas.getBoundingClientRect();
+    const btnWidth = restartBtn.offsetWidth;
+
+    /* horizontaal in het midden van de canvas */
+    restartBtn.style.left = rect.left + rect.width / 2 - btnWidth / 2 + 'px';
+
+    /* precies onder de “Final Score”tekst */
+    const centerY = rect.top + rect.height / 2;
+    restartBtn.style.top = centerY + 50 + 'px';
+}
+/* resize */
+window.addEventListener('resize', () => {
+    if (restartBtn.style.display === 'block') {
+        positionRestartButton();
+    }
+});
+
+/* andere random vissen */
 const fishes = [];
-
-// keyboard state
+const bubbles = [];
+/* toetsen die ingedrukt zijn */
 const keys = {};
 
-// helpers
 function rand(min, max) {
     return Math.random() * (max - min) + min;
 }
 
+/* klasse voor andere vissen */
 class Fish {
     constructor(x, y, size, speed, color, direction) {
         this.x = x;
@@ -37,14 +67,15 @@ class Fish {
         this.size = size;
         this.speed = speed;
         this.color = color;
-        this.dir = direction; // angle in radians
+        this.dir = direction;
+        this.collisionRadius = size * 0.8;
     }
 
     update() {
-        // move in the direction
+        /* bewegen in huidige richting */
         this.x += Math.cos(this.dir) * this.speed;
         this.y += Math.sin(this.dir) * this.speed;
-        // bounce off walls
+        /* terugkomen aan de andere kant als je de rand passeert */
         if (this.x < -this.size) this.x = WIDTH + this.size;
         if (this.x > WIDTH + this.size) this.x = -this.size;
         if (this.y < -this.size) this.y = HEIGHT + this.size;
@@ -52,68 +83,245 @@ class Fish {
     }
 
     draw() {
+        drawFish(this.x, this.y, this.size, this.color, this.dir);
+    }
+}
+class Bubble {
+    constructor() {
+        this.x = rand(0, WIDTH);
+        this.y = HEIGHT + rand(0, 100);
+        this.size = rand(2, 6);
+        this.speed = rand(0.5, 1.5);
+        this.wobble = rand(0, Math.PI * 2);
+    }
+
+    update() {
+        this.y -= this.speed;
+
+        /* kleine zijwaartse beweging */
+        this.x += Math.sin(this.wobble) * 0.3;
+        this.wobble += 0.05;
+
+        /* reset als bubbel boven uit beeld gaat */
+        if (this.y < -10) {
+            this.x = rand(0, WIDTH);
+            this.y = HEIGHT + rand(20, 100);
+        }
+    }
+
+    draw() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
+        ctx.strokeStyle = "rgba(255,255,255,0.7)";
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(this.x - this.size * 0.3, this.y - this.size * 0.3, this.size * 0.3, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,255,255,0.4)";
         ctx.fill();
     }
 }
-
+/* vissen spawnen (klein/groen of groot/rood) */
 function spawnFish() {
-    const size = rand(5, 60);
-    // bigger fishes are red, smaller are green
-    const color = size < player.size ? 'green' : 'red';
-    const x = rand(0, WIDTH);
-    const y = rand(0, HEIGHT);
+    /* 30% kans op kleine groene vis, 70% kans op grote rode vis */
+    let size, color;
+    if (Math.random() < 0.3) {
+        /* kleine groene vis: grootte kleiner dan speler maar minstens 5 */
+        size = rand(5, Math.max(5, player.size - 1));
+        color = 'green';
+    } else {
+        /* grote rode vis: minstens zo groot als speler, maar niet te groot (max 60) */
+        size = rand(Math.min(60, player.size + 1), 60);
+        color = 'red';
+    }
+
+  /* kies een random rand waar de vis buiten spawnt */
+    const side = Math.floor(Math.random() * 4);
+
+    if (side === 0) {          /* links buiten scherm */
+        x = -size;
+        y = rand(0, HEIGHT);
+        dir = rand(-Math.PI / 4, Math.PI / 4); /* richting rechts */
+    } else if (side === 1) {   /* rechts buiten scherm */
+        x = WIDTH + size;
+        y = rand(0, HEIGHT);
+        dir = rand((3 * Math.PI) / 4, (5 * Math.PI) / 4); /* richting links */
+    } else if (side === 2) {   /* boven buiten scherm */
+        x = rand(0, WIDTH);
+        y = -size;
+        dir = rand(Math.PI / 4, (3 * Math.PI) / 4); /* richting naar beneden */
+    } else {                   /* onder buiten scherm */    
+        x = rand(0, WIDTH);
+        y = HEIGHT + size;
+        dir = rand((5 * Math.PI) / 4, (7 * Math.PI) / 4); /* richting naar boven */
+    }
     const speed = rand(0.5, 2);
-    const dir = rand(0, Math.PI * 2);
+
     fishes.push(new Fish(x, y, size, speed, color, dir));
 }
 
-function updatePlayer() {
-    if (keys['ArrowUp'] || keys['w']) player.y -= player.speed;
-    if (keys['ArrowDown'] || keys['s']) player.y += player.speed;
-    if (keys['ArrowLeft'] || keys['a']) player.x -= player.speed;
-    if (keys['ArrowRight'] || keys['d']) player.x += player.speed;
+/* starten met vissen spawnen elke seconde, en vorige interval stoppen als die er nog is */
+function startSpawningFish() {
+    if (spawnIntervalId !== null) {
+        clearInterval(spawnIntervalId);
+    }
+    spawnIntervalId = setInterval(spawnFish, 1000);
+}
 
-    // keep inside canvas
+/* alle toetsen-resetten, zodat er geen 'vast' ingedrukte richting blijft na restart */
+function resetKeys() {
+    for (const k in keys) {
+        keys[k] = false;
+    }
+}
+
+/* zet het spel terug naar beginwaarden */
+function resetGame() {
+    score = 0;
+    gameOver = false;
+    gameWon = false;
+    fishes.length = 0; /* bestaande vissen verwijderen */
+    player.x = WIDTH / 2;
+    player.y = HEIGHT / 2;
+    player.size = 20;
+    player.speed = 3;
+    player.dir = 0;
+    player.collisionRadius = player.size * 0.8;
+
+    resetKeys(); /* toetsen leegmaken */
+    restartBtn.style.display = 'none'; /* herstartknop verbergen */
+
+    startSpawningFish(); /* weer vissen spawnen */
+    gameLoop(); /* game loop opnieuw starten */
+    
+}
+
+function updatePlayer() {
+    /* beweging en oriëntatie bijhouden */
+    let dx = 0, dy = 0;
+    if (keys['ArrowUp'] || keys['w']) dy -= player.speed;
+    if (keys['ArrowDown'] || keys['s']) dy += player.speed;
+    if (keys['ArrowLeft'] || keys['a']) dx -= player.speed;
+    if (keys['ArrowRight'] || keys['d']) dx += player.speed;
+
+    if (dx !== 0 || dy !== 0) {
+        player.dir = Math.atan2(dy, dx);
+    }
+
+    player.x += dx;
+    player.y += dy;
+
+    /* binnen canvas houden */
     player.x = Math.max(player.size, Math.min(WIDTH - player.size, player.x));
     player.y = Math.max(player.size, Math.min(HEIGHT - player.size, player.y));
+}
+function circleCollision(x1, y1, r1, x2, y2, r2) {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const dist = Math.hypot(dx, dy);
+    return dist < r1 + r2;
+}
+function updateFishColors() {
+    fishes.forEach(f => {
+        if (f.size < player.size) {
+            f.color = 'green'; /*eetbaar*/
+        } else {
+            f.color = 'red'; /*gevaarlijk*/
+        }
+    });
 }
 
 function checkCollisions() {
     for (let i = fishes.length - 1; i >= 0; i--) {
         const f = fishes[i];
-        const dx = f.x - player.x;
-        const dy = f.y - player.y;
-        const dist = Math.hypot(dx, dy);
-        if (dist < f.size + player.size) {
-            // collision
+
+        /* BODY hitbox */
+        const bodyHit = circleCollision(
+            player.x,
+            player.y,
+            player.collisionRadius,
+            f.x,
+            f.y,
+            f.size * 0.6
+        );
+
+        /* STAART hitbox (achter de vis) */
+        const tailX = f.x - Math.cos(f.dir) * f.size;
+        const tailY = f.y - Math.sin(f.dir) * f.size;
+
+        const tailHit = circleCollision(
+            player.x,
+            player.y,
+            player.collisionRadius,
+            tailX,
+            tailY,
+            f.size * 0.35
+        );
+
+        if (bodyHit || tailHit) {
+
             if (f.size < player.size) {
-                // eat fish
                 fishes.splice(i, 1);
+
                 score += Math.floor(f.size);
-                // grow a bit
-                player.size += f.size * 0.05;
+
+                player.size += f.size * 0.08;
+
+                player.collisionRadius = player.size * 0.55;
+
             } else {
-                // eaten by big fish
+
                 gameOver = true;
+
+                if (spawnIntervalId !== null) {
+                    clearInterval(spawnIntervalId);
+                }
             }
         }
     }
 }
+/* helper om een vis te tekenen met een simpel lijfje, staart en oog */
+function drawFish(x, y, size, color, dir) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(dir);
+
+    /* lijf */
+    ctx.beginPath();
+    ctx.ellipse(0, 0, size, size / 1.8, 0, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+
+    /* staart */
+    ctx.beginPath();
+    ctx.moveTo(-size, 0);
+    ctx.lineTo(-size - size / 2, -size / 2);
+    ctx.lineTo(-size - size / 2, size / 2);
+    ctx.closePath();
+    ctx.fill();
+
+    /* oog */
+    ctx.beginPath();
+    ctx.arc(size * 0.4, -size * 0.2, size * 0.1, 0, Math.PI * 2);
+    ctx.fillStyle = 'white';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(size * 0.4, -size * 0.2, size * 0.05, 0, Math.PI * 2);
+    ctx.fillStyle = 'black';
+    ctx.fill();
+
+    ctx.restore();
+}
 
 function drawPlayer() {
-    ctx.beginPath();
-    ctx.arc(player.x, player.y, player.size, 0, Math.PI * 2);
-    ctx.fillStyle = player.color;
-    ctx.fill();
+    drawFish(player.x, player.y, player.size, player.color, player.dir);
 }
 
 function drawScore() {
     ctx.fillStyle = 'black';
     ctx.font = '20px sans-serif';
-    ctx.fillText('Score: ' + score, 10, 30);
+    ctx.textAlign = 'left';
+    ctx.fillText('Score: ' + score, 10, 60);
 }
 
 function drawGameOver() {
@@ -125,6 +333,25 @@ function drawGameOver() {
     ctx.fillText('Game Over', WIDTH / 2, HEIGHT / 2 - 20);
     ctx.font = '20px sans-serif';
     ctx.fillText('Final Score: ' + score, WIDTH / 2, HEIGHT / 2 + 20);
+
+    /* laat de herstartknop zien en goed positioneren */
+    restartBtn.style.display = 'block';
+    positionRestartButton();
+}
+function drawWin() {
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+    ctx.fillStyle = 'white';
+    ctx.font = '40px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('You Won!', WIDTH / 2, HEIGHT / 2 - 20);
+
+    ctx.font = '20px sans-serif';
+    ctx.fillText('Final Score: ' + score, WIDTH / 2, HEIGHT / 2 + 20);
+
+    restartBtn.style.display = 'block';
+    positionRestartButton();
 }
 
 function gameLoop() {
@@ -133,32 +360,71 @@ function gameLoop() {
         return;
     }
 
-    ctx.clearRect(0, 0, WIDTH, HEIGHT);
+    if (gameWon) {
+        drawWin();
+        return;
+    }
 
+    ctx.clearRect(0, 0, WIDTH, HEIGHT);
+    
+bubbles.forEach(b => {
+    b.update();
+    b.draw();
+});
     updatePlayer();
 
-    fishes.forEach(f => {
-        f.update();
-        f.draw();
-    });
+    updateFishColors(); /* kleur aanpassen op basis van nieuwe grootte */
+
+fishes.forEach(f => {
+    f.update();
+    f.draw();
+});
+
 
     drawPlayer();
     drawScore();
     checkCollisions();
+    checkWin();
 
     requestAnimationFrame(gameLoop);
 }
+/* controleren of er nog rode vissen zijn, en zo niet, dan winnen */
+function checkWin() {
 
-// input listeners
+    if (fishes.length < 5) return;
+
+    const redFishExists = fishes.some(f => f.size >= player.size);
+
+    if (!redFishExists) {
+
+        gameWon = true;
+
+        if (spawnIntervalId !== null) {
+            clearInterval(spawnIntervalId);
+        }
+    }
+}
+
+/* key events */
 window.addEventListener('keydown', e => {
+    /* voorkom dat pijltoetsen scrollen */
+    if ([
+        'ArrowUp',
+        'ArrowDown',
+        'ArrowLeft',
+        'ArrowRight',
+        ' '
+    ].includes(e.key)) {
+        e.preventDefault();
+    }
     keys[e.key] = true;
 });
 window.addEventListener('keyup', e => {
     keys[e.key] = false;
 });
-
-// spawn fish every second
-setInterval(spawnFish, 1000);
-
-// start the loop
+for (let i = 0; i < 25; i++) {
+    bubbles.push(new Bubble());
+}
+/* start: vissen spawnen en game loop starten */
+startSpawningFish();
 gameLoop();
