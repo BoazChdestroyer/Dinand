@@ -20,10 +20,10 @@ const goalBottom = (canvas.height + goalheight) / 2;
     if(keys["s"]) p1.y += playerSpeed;
     if(keys["d"]) p1.x += playerSpeed;
     if(keys["a"]) p1.x -= playerSpeed;
-    if(keys["ArrowUp"]) p2.y -= playerSpeed;
-    if(keys["ArrowDown"]) p2.y += playerSpeed;
-    if(keys["ArrowLeft"]) p2.x -= playerSpeed;
-    if(keys["ArrowRight"]) p2.x += playerSpeed;
+    if(keys["i"]) p2.y -= playerSpeed;
+    if(keys["k"]) p2.y += playerSpeed;
+    if(keys["j"]) p2.x -= playerSpeed;
+    if(keys["l"]) p2.x += playerSpeed;
 
     p1.y = Math.max(p1.r, Math.min(canvas.height - p1.r, p1.y));
     p1.x = Math.max(p1.r, Math.min(canvas.width - p1.r, p1.x));
