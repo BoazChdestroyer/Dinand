@@ -91,7 +91,7 @@ header{
 }
 
 .video-tekst p{
-    color: #94A3B8;
+    color: white;
     max-width: 210px;
 }
 
@@ -234,7 +234,7 @@ header{
     left: 5%;
     z-index: 1;
     max-width: 250px;
-    color: lightblue;
+    color: #15213d;
 }
 
 .card video{
