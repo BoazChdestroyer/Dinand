@@ -10,13 +10,18 @@ const ctx = canvas.getContext("2d");
 
  let keys = {};
 
- document.addEventListener("keydown", e => keys[e.key] = true);
- document.addEventListener("keyup", e => keys[e.key] = false);
- document.addEventListener("keydown", e => {
+document.addEventListener("keydown", e => {
+
     keys[e.key] = true;
-    if(e.code === "Enter" && !gameStarted){
+
+    if(e.key === "g" && !gameStarted){
         startCountdown();
     }
+
+});
+
+document.addEventListener("keyup", e => {
+    keys[e.key] = false;
 });
 
 const goalheight = 120;
@@ -218,7 +223,7 @@ function tekenStartscherm() {
       ctx.textAlign = "center";
       ctx.fillText("1v1 Airhockey", canvas.width/2, canvas.height/2 - 40);
       ctx.font = "30px Arial";
-      ctx.fillText("Druk op ENTER om te starten", canvas.width/2, canvas.height/2 + 40);
+      ctx.fillText("Druk op G om te starten", canvas.width/2, canvas.height/2 + 40);
 }
 
 function tekenCountdown() {
