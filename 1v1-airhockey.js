@@ -59,6 +59,12 @@ function checkCollisions() {
 function teken() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // middenlijn
+    ctx.beginPath();
+    ctx.moveTo(canvas.width/2,0);
+    ctx.lineTo(canvas.width/2,canvas.height);
+    ctx.stroke();
+
     // speler 1
     ctx.beginPath();
     ctx.arc(p1.x, p1.y, p1.r, 0, Math.PI * 2);
@@ -79,6 +85,11 @@ function teken() {
     ctx.fillStyle = "black";
     ctx.fill();
     ctx.closePath();
+    
+    // score
+    ctx.font = "30px Arial";
+    ctx.fillText(p1.score, canvas.width/4, 40);
+    ctx.fillText(p2.score, canvas.width*3/4, 40);
 }
 
 function gameLoop() {
