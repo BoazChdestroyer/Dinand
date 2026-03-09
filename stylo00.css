@@ -403,7 +403,7 @@ header{
 canvas {
     display: block;
     width: 800px;
-    height: 400px;
+    height: auto;
     border: 3px solid #94A3B8;
     border-radius: 10px;
     box-shadow:
@@ -418,14 +418,14 @@ canvas {
 }
 
 .sidebar {
-    margin-left: 20px;
-    width: 200px;
+    width: 260px;
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
 .game-card {
+    position: relative;
     overflow: hidden;
     border: 1px solid white;
     padding: 15px 25px;
