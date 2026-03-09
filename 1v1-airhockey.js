@@ -29,6 +29,9 @@ const goalBottom = (canvas.height + goalheight) / 2;
     p1.x = Math.max(p1.r, Math.min(canvas.width - p1.r, p1.x));
     p2.y = Math.max(p2.r, Math.min(canvas.height - p2.r, p2.y));
     p2.x = Math.max(p2.r, Math.min(canvas.width - p2.r, p2.x));
+
+    p1.x = Math.min(p1.x, canvas.width/2 - p1.r);
+    p2.x = Math.max(p2.x, canvas.width/2 + p2.r);
  }
 
 function beweegPuck() {
