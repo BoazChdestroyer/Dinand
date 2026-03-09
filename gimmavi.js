@@ -10,7 +10,7 @@ const player = {
     y: HEIGHT / 2,
     size: 20,
     speed: 3,
-    color: 'blue',
+    color: 'yellow',
     dir: 0, /* kijkrichting in radialen, 0 = naar rechts */
     collisionRadius: 20 * 0.8 /* botsingscirkel, iets kleiner dan lijf */
 };
