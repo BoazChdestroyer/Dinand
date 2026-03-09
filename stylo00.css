@@ -368,7 +368,15 @@ header{
     height: 100vh;
     margin-top: 100px;
     position: relative;
+    background-image:url("bijlage/oceaan.jpg");
+    backdrop-filter: blur(5px);
+    background-size:cover;
+    background-position:center;
     /*overflow: hidden;*/
+}
+#game{
+    border-radius:10px;
+    background:transparent;
 }
 
 .fishy img {
