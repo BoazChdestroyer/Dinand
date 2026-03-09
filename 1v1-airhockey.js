@@ -213,6 +213,7 @@ function startCountdown() {
 function tekenStartscherm() {
       ctx.fillStyle = "white";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "black";
       ctx.font = "60px Arial";
       ctx.textAlign = "center";
       ctx.fillText("1v1 Airhockey", canvas.width/2, canvas.height/2 - 40);
