@@ -9,6 +9,11 @@ const ctx = canvas.getContext("2d");
  document.addEventListener("keydown", e => keys[e.key] = true);
  document.addEventListener("keyup", e => keys[e.key] = false);
 
+const goalheight = 120;
+const goaltop = (canvas.height - goalheight) / 2;
+const goalbottom = (canvas.height + goalheight) / 2;
+
+
  function beweegPLayers() {
     if(keys["w"]) p1.y -= 5;
     if(keys["s"]) p1.y += 5;
@@ -28,14 +33,26 @@ const ctx = canvas.getContext("2d");
 function beweegPuck() {
     puck.x += puck.vx;
     puck.y += puck.vy;
+    puck.vx *= 0.99;
+    puck.vy *= 0.99;
 
-    if(puck.y < puck.r || puck.y > canvas.height - puck.r) {
-          puck.vy *= -1;
+// linker muur
+if(puck.x - puck.r < 0) {
+
+    if(puck.y < goalTop || puck.y > goalBottom) {
+        puck.vx *= -1;
     }
 
-    if(puck.x < puck.r || puck.x > canvas.width - puck.r) {
-            puck.vx *= -1;
-}    
+}
+
+// rechter muur
+if(puck.x + puck.r > canvas.width) {
+
+    if(puck.y < goalTop || puck.y > goalBottom) {
+        puck.vx *= -1;
+    }
+
+}
 }
 
 function checkCollisions() {
@@ -46,9 +63,10 @@ function checkCollisions() {
 
             if(dist < puck.r + player.r) {
                   const angle = Math.atan2(dy, dx);
+                  const overlap = puck.r + player.r - dist;
+                  puck.x += Math.cos(angle) * overlap;
+                  puck.y += Math.sin(angle) * overlap;
                   const speed = Math.sqrt(puck.vx*puck.vx + puck.vy*puck.vy) + 2;               
-
-
 
                   puck.vx = Math.cos(angle) * speed;
                   puck.vy = Math.sin(angle) * speed;
@@ -60,10 +78,22 @@ function teken() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // middenlijn
+    ctx.strokeStyle = "red";
     ctx.beginPath();
     ctx.moveTo(canvas.width/2,0);
     ctx.lineTo(canvas.width/2,canvas.height);
     ctx.stroke();
+
+    // middencirkel
+    ctx.strokeStyle = "blue";
+    ctx.beginPath();
+    ctx.arc(canvas.width/2, canvas.height/2, 50, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // goals
+    ctx.fillStyle = "red";
+    ctx.fillRect(0, goalTop, 10, goalheight);
+    ctx.fillRect(canvas.width - 10, goalTop, 10, goalheight);
 
     // speler 1
     ctx.beginPath();
@@ -87,15 +117,44 @@ function teken() {
     ctx.closePath();
     
     // score
+    ctx.fillStyle = "black";
     ctx.font = "30px Arial";
     ctx.fillText(p1.score, canvas.width/4, 40);
     ctx.fillText(p2.score, canvas.width*3/4, 40);
+}
+
+function checkScore() {
+
+    // links goal
+    if(puck.x < 0 && puck.y > goalTop && puck.y < goalBottom) {
+        p2.score++;
+        resetPuck();
+    }
+
+    // rechts goal
+    if(puck.x > canvas.width && puck.y > goalTop && puck.y < goalBottom) {
+        p1.score++;
+        resetPuck();
+    }
+
+}
+
+function resetPuck() {
+
+    puck.x = canvas.width/2;
+    puck.y = canvas.height/2;
+
+    puck.vx = (Math.random() > 0.5 ? 4 : -4);
+    puck.vy = (Math.random()*4) - 2;
+
 }
 
 function gameLoop() {
     beweegPLayers();
     beweegPuck();
     checkCollisions();
+    resetPuck();
+    checkScore();
     teken();
     requestAnimationFrame(gameLoop);
 }
