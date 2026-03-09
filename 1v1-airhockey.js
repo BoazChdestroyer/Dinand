@@ -3,11 +3,21 @@ const ctx = canvas.getContext("2d");
  let p1 = {x: 100,y:200,r: 20,score: 0};
  let p2 = {x: 700,y:200,r: 20,score: 0};
  let puck = {x: 400,y:200,r: 10,vx: 0,vy: 0};
+ let gameStarted = false;
+ let countdown = 3;
+ let countdownActive = false;
+
 
  let keys = {};
 
  document.addEventListener("keydown", e => keys[e.key] = true);
  document.addEventListener("keyup", e => keys[e.key] = false);
+ document.addEventListener("keydown", e => {
+    keys[e.key] = true;
+    if(e.code === "Space" && !gameStarted){
+        startCountdown();
+    }
+});
 
 const goalheight = 120;
 const goalTop = (canvas.height - goalheight) / 2;
@@ -188,8 +198,45 @@ function resetGame() {
       resetPlayers();
 }
 
+function startCountdown() {
+      countdownActive = true;
+      let timer = setInterval(() => {
+            countdown--;
+            if (countdown <= 0) {
+                  clearInterval(timer);
+                  gameStarted = true;
+                  countdownActive = false;
+            }
+      },1000);
+}    
+
+function tekenStartscherm() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "black";
+      ctx.font = "60px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText("1v1 Airhockey", canvas.width/2, canvas.height/2 - 40);
+      ctx.font = "30px Arial";
+      ctx.fillText("Druk op SPACE om te starten", canvas.width/2, canvas.height/2 + 40);
+}
+
+function tekenCountdown() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.font = "100px Arial";
+      ctx.fillStyle = "red";
+      ctx.textAlign = "center";
+      if (countdown >= 0) {
+            ctx.fillText(countdown, canvas.width/2, canvas.height/2);
+      }
+}
+
 function gameLoop() {
-    beweegPLayers();
+      if(!gameStarted && !countdownActive) {
+            tekenStartscherm();
+      } else if(countdownActive) {
+            tekenCountdown();
+      } else {
+      beweegPLayers();
     beweegPuck();
     checkCollisions();
     checkScore();
@@ -197,6 +244,7 @@ function gameLoop() {
     if(!checkWin()){
         requestAnimationFrame(gameLoop);
     }
+}
 }
 
 gameLoop();

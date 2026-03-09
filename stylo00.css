@@ -410,7 +410,7 @@ header{
     box-shadow:
         0 10px 40px rgba(0,0,0,0.6),
         0 0 15px #94A3B8;
-    animation: FadeInGame 1s ease;
+    animation: FadeInGame 1s ease forwards;
 }
 
 .spel-canvas p {
