@@ -366,7 +366,7 @@ header{
 .fishy {
     margin-top: 80px;
     position: relative;
-    overflow: hidden;
+    /*overflow: hidden;*/
 }
 
 .fishy img {
