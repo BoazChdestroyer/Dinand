@@ -462,7 +462,7 @@ canvas {
 
 .game-card p{
     position: absolute;
-    top: 80px;
+    top: 60px;
     left: 5%;
     z-index: 1;
     max-width: 250px;
