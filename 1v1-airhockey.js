@@ -15,14 +15,15 @@ const goalBottom = (canvas.height + goalheight) / 2;
 
 
  function beweegPLayers() {
-    if(keys["w"]) p1.y -= 5;
-    if(keys["s"]) p1.y += 5;
-    if(keys["d"]) p1.x += 5;
-    if(keys["a"]) p1.x -= 5;
-    if(keys["ArrowUp"]) p2.y -= 5;
-    if(keys["ArrowDown"]) p2.y += 5;
-    if(keys["ArrowLeft"]) p2.x -= 5;
-    if(keys["ArrowRight"]) p2.x += 5;
+      const playerSpeed = 8;
+    if(keys["w"]) p1.y -= playerSpeed;
+    if(keys["s"]) p1.y += playerSpeed;
+    if(keys["d"]) p1.x += playerSpeed;
+    if(keys["a"]) p1.x -= playerSpeed;
+    if(keys["ArrowUp"]) p2.y -= playerSpeed;
+    if(keys["ArrowDown"]) p2.y += playerSpeed;
+    if(keys["ArrowLeft"]) p2.x -= playerSpeed;
+    if(keys["ArrowRight"]) p2.x += playerSpeed;
 
     p1.y = Math.max(p1.r, Math.min(canvas.height - p1.r, p1.y));
     p1.x = Math.max(p1.r, Math.min(canvas.width - p1.r, p1.x));
@@ -36,23 +37,26 @@ function beweegPuck() {
     puck.vx *= 0.99;
     puck.vy *= 0.99;
 
-// linker muur
-if(puck.x - puck.r < 0) {
+      if(puck.y < puck.r || puck.y > canvas.height-puck.r){
+             puck.vy *= -1;
+      }
 
-    if(puck.y < goalTop || puck.y > goalBottom) {
+      // linker muur
+      if(puck.x - puck.r < 0) {
+
+      if(puck.y < goalTop || puck.y > goalBottom) {
         puck.vx *= -1;
-    }
+      }
+      }
 
-}
+      // rechter muur
+      if(puck.x + puck.r > canvas.width) {
 
-// rechter muur
-if(puck.x + puck.r > canvas.width) {
-
-    if(puck.y < goalTop || puck.y > goalBottom) {
-        puck.vx *= -1;
-    }
-
-}
+      if(puck.y < goalTop || puck.y > goalBottom) {
+            puck.vx *= -1;
+      }
+    
+      }
 }
 
 function checkCollisions() {
@@ -129,12 +133,14 @@ function checkScore() {
     if(puck.x < 0 && puck.y > goalTop && puck.y < goalBottom) {
         p2.score++;
         resetPuck();
+        resetPlayers();
     }
 
     // rechts goal
     if(puck.x > canvas.width && puck.y > goalTop && puck.y < goalBottom) {
         p1.score++;
         resetPuck();
+        resetPlayers();
     }
 
 }
@@ -149,13 +155,44 @@ function resetPuck() {
 
 }
 
+function resetPlayers(){
+      p1.x = 100;
+      p1.y = canvas.height/2;
+      p2.x = canvas.width - 100;
+      p2.y = canvas.height/2;
+
+}
+
+function checkWin() {
+      if(p1.score >= 7) {
+            alert("Speler 1 wint!");
+            resetGame();
+            return true;
+      }
+      if(p2.score >= 7) {
+            alert("Speler 2 wint!");
+            resetGame();
+            return true;
+      }
+      return false;
+}
+
+function resetGame() {
+      p1.score = 0;
+      p2.score = 0;
+      resetPuck();
+      resetPlayers();
+}
+
 function gameLoop() {
     beweegPLayers();
     beweegPuck();
     checkCollisions();
     checkScore();
     teken();
-    requestAnimationFrame(gameLoop);
+    if(!checkWin()){
+        requestAnimationFrame(gameLoop);
+    }
 }
 
 gameLoop();
