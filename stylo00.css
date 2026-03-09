@@ -81,7 +81,7 @@ header{
 }
 
 .video-tekst h1{
-    font-size: 60px;
+    font-size: 55px;
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
     font-weight: 900;
     font-style: normal;
@@ -91,7 +91,7 @@ header{
 }
 
 .video-tekst p{
-    color:#15213d;
+    color: #94A3B8;
     max-width: 210px;
 }
 
