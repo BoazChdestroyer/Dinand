@@ -292,7 +292,7 @@ function guess(letter) {
 function checkWin() {
   if (word.split("").every(ch => guessed.has(ch))) {
     gameOver = true;
-    msgEl.textContent = "Gefeliciteerd, je hebt gewonnen! 🎉";
+    msgEl.textContent = "Gefeliciteerd, je hebt gewonnen!";
     msgEl.className = "message win";
     disableAllButtons();
   }
