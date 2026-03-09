@@ -368,10 +368,6 @@ header{
     height: 100vh;
     margin-top: 100px;
     position: relative;
-    background-image:url("bijlage/oceaan.jpg");
-    backdrop-filter: blur(5px);
-    background-size:cover;
-    background-position:center;
     /*overflow: hidden;*/
 }
 #game{
@@ -407,6 +403,9 @@ header{
         0 10px 40px rgba(0,0,0,0.6),
         0 0 15px #94A3B8;
     animation: FadeInGame 1s ease;
+    background-image:url("bijlage/oceaan.jpg");
+    background-size:cover;
+    background-position:center;
 }
 
 canvas {
