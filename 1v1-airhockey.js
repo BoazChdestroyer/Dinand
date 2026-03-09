@@ -1,4 +1,4 @@
-const canvas = document.getElementById("gameCanvas");
+const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
  let p1 = {x: 100,y:200,r: 20,score: 0};
  let p2 = {x: 700,y:200,r: 20,score: 0};
@@ -10,8 +10,8 @@ const ctx = canvas.getContext("2d");
  document.addEventListener("keyup", e => keys[e.key] = false);
 
 const goalheight = 120;
-const goaltop = (canvas.height - goalheight) / 2;
-const goalbottom = (canvas.height + goalheight) / 2;
+const goalTop = (canvas.height - goalheight) / 2;
+const goalBottom = (canvas.height + goalheight) / 2;
 
 
  function beweegPLayers() {
@@ -153,7 +153,6 @@ function gameLoop() {
     beweegPLayers();
     beweegPuck();
     checkCollisions();
-    resetPuck();
     checkScore();
     teken();
     requestAnimationFrame(gameLoop);
