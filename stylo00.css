@@ -402,6 +402,16 @@ header{
     background-position:center;
 }
 
+.spel-canvas {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 25px;
+    border-radius: 15px;
+    backdrop-filter: blur(5px);
+    box-shadow:
+        0 10px 40px rgba(0,0,0,0.6),
+        0 0 15px #94A3B8;
+    animation: FadeInGame 1s ease;
+}
 
 canvas {
     display: block;
