@@ -79,6 +79,7 @@ function checkCollisions() {
 }
 
 function teken() {
+      ctx.fillStyle = "white";
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // middenlijn
