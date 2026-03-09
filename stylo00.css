@@ -413,6 +413,12 @@ header{
     animation: FadeInGame 1s ease;
 }
 
+.spel-canvas p {
+    text-align: center;
+    color: #94A3B8;
+    margin-top: 15px;
+}
+
 canvas {
     display: block;
     width: 800px;
