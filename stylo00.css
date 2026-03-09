@@ -364,7 +364,7 @@ header{
 }
 
 .fishy {
-    padding: 80px 0;
+    padding: 60px 0;
     position: relative;
     overflow: hidden;
 }
@@ -374,18 +374,19 @@ header{
     height: 100%;
     object-fit: cover;
     position: absolute;
-    top: 0;
-    left: 0;
+    inset: 0;
     z-index: 0;
 }
 
 .content-wrapper{
     position: relative;
     z-index: 1 ;
-    display: flex  ;
+    max-width: 1100px;
+    margin: auto;
+    display: flex;
     justify-content: center;
     align-items: flex-start;
-    gap: 40px;
+    gap: 30px;
 }
 
 .game-canvas {
@@ -401,6 +402,8 @@ header{
 
 canvas {
     display: block;
+    width: 800px;
+    height: 400px;
     border: 3px solid #94A3B8;
     border-radius: 10px;
     box-shadow:
@@ -415,7 +418,8 @@ canvas {
 }
 
 .sidebar {
-    margin-left: 30px;
+    margin-left: 20px;
+    width: 200px;
     display: flex;
     flex-direction: column;
     gap: 20px;
