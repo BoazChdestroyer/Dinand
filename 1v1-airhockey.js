@@ -24,6 +24,7 @@ document.addEventListener("keyup", e => {
     keys[e.key] = false;
 });
 
+
 const goalheight = 120;
 const goalTop = (canvas.height - goalheight) / 2;
 const goalBottom = (canvas.height + goalheight) / 2;
@@ -208,10 +209,10 @@ function startCountdown() {
       countdownActive = true;
       let timer = setInterval(() => {
             countdown--;
-            if (countdown <= 0) {
+            if (countdown < 0) {
                   clearInterval(timer);
-                  gameStarted = true;
                   countdownActive = false;
+                  gameStarted = true;
             }
       },1000);
 }    
@@ -238,21 +239,24 @@ function tekenCountdown() {
 }
 
 function gameLoop() {
-      if(!gameStarted && !countdownActive) {
-            tekenStartscherm();
-      } else if(countdownActive) {
-            tekenCountdown();
-      } else {
-      beweegPLayers();
-    beweegPuck();
-    checkCollisions();
-    checkScore();
-    teken();
-    if(!checkWin()){
-        requestAnimationFrame(gameLoop);
+      if(!gameStarted && countdownActive) {
+        tekenCountdown();
+    } 
+    else if(!gameStarted) {
+        tekenStartscherm();
+    } 
+    else {
+        beweegPLayers();
+        beweegPuck();
+        checkCollisions();
+        checkScore();
+        teken();
+        checkWin();
     }
+
+    requestAnimationFrame(gameLoop);
 }
-}
+
 
 gameLoop();
 
