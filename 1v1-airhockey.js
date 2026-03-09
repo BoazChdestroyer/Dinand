@@ -211,7 +211,7 @@ function startCountdown() {
 }    
 
 function tekenStartscherm() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = "white";
       ctx.font = "60px Arial";
       ctx.textAlign = "center";
