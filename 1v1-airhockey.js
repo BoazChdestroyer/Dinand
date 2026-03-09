@@ -14,7 +14,7 @@ const ctx = canvas.getContext("2d");
  document.addEventListener("keyup", e => keys[e.key] = false);
  document.addEventListener("keydown", e => {
     keys[e.key] = true;
-    if(e.code === "Space" && !gameStarted){
+    if(e.code === "enter" && !gameStarted){
         startCountdown();
     }
 });
@@ -212,12 +212,12 @@ function startCountdown() {
 
 function tekenStartscherm() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "black";
+      ctx.fillStyle = "white";
       ctx.font = "60px Arial";
       ctx.textAlign = "center";
       ctx.fillText("1v1 Airhockey", canvas.width/2, canvas.height/2 - 40);
       ctx.font = "30px Arial";
-      ctx.fillText("Druk op SPACE om te starten", canvas.width/2, canvas.height/2 + 40);
+      ctx.fillText("Druk op ENTER om te starten", canvas.width/2, canvas.height/2 + 40);
 }
 
 function tekenCountdown() {
