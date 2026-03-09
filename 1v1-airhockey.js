@@ -204,6 +204,7 @@ function resetGame() {
 }
 
 function startCountdown() {
+      countdown = 3;
       countdownActive = true;
       let timer = setInterval(() => {
             countdown--;
