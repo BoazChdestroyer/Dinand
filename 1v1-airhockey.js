@@ -15,7 +15,7 @@ const goalBottom = (canvas.height + goalheight) / 2;
 
 
  function beweegPLayers() {
-      const playerSpeed = 8;
+      const playerSpeed = 6.5;
     if(keys["w"]) p1.y -= playerSpeed;
     if(keys["s"]) p1.y += playerSpeed;
     if(keys["d"]) p1.x += playerSpeed;
