@@ -89,7 +89,7 @@ function checkCollisions() {
                   const overlap = puck.r + player.r - dist;
                   puck.x += Math.cos(angle) * overlap;
                   puck.y += Math.sin(angle) * overlap;
-                  const speed = Math.sqrt(puck.vx*puck.vx + puck.vy*puck.vy) + 2;               
+                  const speed = Math.sqrt(puck.vx*puck.vx + puck.vy*puck.vy) + 3;               
 
                   puck.vx = Math.cos(angle) * speed;
                   puck.vy = Math.sin(angle) * speed;
